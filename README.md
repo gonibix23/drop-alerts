@@ -6,6 +6,8 @@ El contenedor usa Python 3.12 slim, un único servicio y un volumen. No publica 
 
 El estado de esta entrega y las comprobaciones realizadas están en [verificación](docs/verification.md). Si recibes el proyecto como ZIP, extráelo como `drop-alerts` y entra en esa carpeta en lugar de ejecutar `git clone`.
 
+La [investigación ampliada de fuentes](docs/source-expansion-research.md) compara canales oficiales, redes, boletines, medios y calendarios para anticipar Secret Lair y drops especiales. Incluye rutas comprobadas, prioridades y límites. Las nuevas fuentes son propuestas; el monitor sigue utilizando las dos integraciones iniciales.
+
 ## Arranque con Docker
 
 El stack construye la imagen desde el código del repositorio mediante `build:`. En Portainer utiliza **Stacks → Add stack → Repository**, con la rama `refs/heads/main` y la ruta `docker-compose.yml`. El repositorio es privado: configura el acceso Git que utilices para tus otros repositorios privados. Este despliegue no requiere credenciales de un registro de imágenes.
