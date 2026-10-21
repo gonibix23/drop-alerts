@@ -8,21 +8,23 @@ El estado de esta entrega y las comprobaciones realizadas están en [verificaci�
 
 ## Arranque con Docker
 
-En el equipo que ejecuta Docker —la VM o el LXC de Proxmox donde se conecta Portainer—:
+El stack utiliza `ghcr.io/gonibix23/drop-alerts:main`. GitHub Actions construye y publica esa imagen después de superar las pruebas de `main`; comprueba que la ejecución de publicación haya terminado antes de desplegar. El paquete es privado: configura el acceso a GitHub Container Registry en Portainer como indica [la guía de despliegue](docs/deployment.md).
+
+En el equipo que ejecuta Docker —la VM o el LXC de Proxmox donde se conecta Portainer—, autentica primero Docker en `ghcr.io` con un token de lectura de paquetes y después ejecuta:
 
 ```sh
 git clone https://github.com/gonibix23/drop-alerts.git
 cd drop-alerts
 cp .env.example .env
 # Editar .env y configurar DISCORD_WEBHOOK_URL.
-docker build -t drop-alerts:1.0.0 .
+docker compose pull
 docker compose up -d
 docker compose logs --tail=100 -f
 ```
 
 La primera comprobación correcta de cada fuente establece una referencia silenciosa (`BOOTSTRAP_MODE=silent`). Las siguientes comprobaciones generan eventos por novedades y cambios reales. Un fallo de extracción conserva el estado anterior; que un producto no aparezca en una lista no demuestra que esté agotado.
 
-Para Portainer, construye o publica la imagen primero y pega [docker-compose.yml](docker-compose.yml) en **Stacks → Add stack → Web editor**. Añade las variables de entorno, especialmente el webhook, y despliega. El procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
+Para Portainer, añade el registro privado `ghcr.io`, pega [docker-compose.yml](docker-compose.yml) en **Stacks → Add stack → Web editor**, selecciona ese registro y configura `DISCORD_WEBHOOK_URL`. Si conservas una variable `DROP_ALERTS_IMAGE=drop-alerts:1.0.0` de un intento anterior, elimínala o cámbiala a `ghcr.io/gonibix23/drop-alerts:main`. El procedimiento completo, la alternativa de construcción local, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
 
 ## Modelo remoto
 
@@ -88,7 +90,7 @@ python -m pip install -e '.[dev]'
 python -m pytest
 ```
 
-Las pruebas usan respuestas guardadas y transportes HTTP simulados: no requieren el modelo real ni envían mensajes a Discord. La integración continua prueba Python 3.12 y 3.14 y construye la imagen en Linux. Que exista este flujo no implica que se haya ejecutado antes de subir el repositorio.
+Las pruebas usan respuestas guardadas y transportes HTTP simulados: no requieren el modelo real ni envían mensajes a Discord. La integración continua prueba Python 3.12 y 3.14 y prepara imágenes Linux amd64 y arm64. La publicación en GHCR se hace desde `main` después de superar las pruebas; las solicitudes de cambios no publican imágenes. Consulta el resultado de la ejecución concreta en GitHub Actions.
 
 Para ejecutar fuera de Docker, configura rutas escribibles locales en `DATABASE_PATH` y `HEARTBEAT_PATH`, y exporta las variables en tu terminal. El archivo `.env` se utiliza para interpolación de Docker Compose; no se carga automáticamente al ejecutar Python directamente.
 

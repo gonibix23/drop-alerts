@@ -1,5 +1,13 @@
 # Solución de problemas
 
+## El stack falla con pull access denied
+
+Comprueba la imagen efectiva en el editor y las variables del stack. El valor predeterminado actual es `ghcr.io/gonibix23/drop-alerts:main`. Si aparece `drop-alerts:1.0.0`, actualiza el Compose y elimina o cambia la variable `DROP_ALERTS_IMAGE` antigua: una variable definida en Portainer prevalece sobre el valor predeterminado del archivo.
+
+La imagen GHCR es privada. Configura **Registries → Add registry → Custom registry** con URL `ghcr.io`, usuario `gonibix23` y un token de GitHub **classic** con `read:packages`. Después permite el acceso al entorno/usuario y selecciona ese registro para el stack según tu versión de Portainer. No uses la contraseña de GitHub. Autenticar el repositorio Git no autentica la descarga de la imagen. Instrucciones y enlaces oficiales en `deployment.md`.
+
+Comprueba también que el trabajo de publicación de GitHub Actions haya terminado correctamente y que exista la etiqueta solicitada. Un error de permisos o una publicación pendiente no se arregla cambiando a una etiqueta inexistente. Si has elegido una construcción local, la imagen debe existir en el mismo Docker Engine que usa Portainer y debes desactivar la descarga forzada de esa imagen local.
+
 ## No llegan mensajes
 
 Consulta logs y `python -m drop_alerts status`. En el arranque inicial, `BOOTSTRAP_MODE=silent` registra los elementos existentes sin avisar. Una regla debe coincidir con el evento. Verifica que el webhook esté configurado y siga existiendo, sin copiar su URL completa a tickets o capturas. Discord puede responder 429; la cola conserva el trabajo y respeta la espera indicada. Un error permanente puede terminar los reintentos: consulta el historial y corrige la configuración antes de reanudar operaciones.
