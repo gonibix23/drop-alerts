@@ -22,7 +22,7 @@ docker compose logs --tail=100 -f
 
 La primera comprobación correcta de cada fuente establece una referencia silenciosa (`BOOTSTRAP_MODE=silent`). Las siguientes comprobaciones generan eventos por novedades y cambios reales. Un fallo de extracción conserva el estado anterior; que un producto no aparezca en una lista no demuestra que esté agotado.
 
-Para Portainer, construye o publica la imagen primero y pega [compose.yaml](compose.yaml) en **Stacks → Add stack → Web editor**. Añade las variables de entorno, especialmente el webhook, y despliega. El procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
+Para Portainer, construye o publica la imagen primero y pega [docker-compose.yml](docker-compose.yml) en **Stacks → Add stack → Web editor**. Añade las variables de entorno, especialmente el webhook, y despliega. El procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
 
 ## Modelo remoto
 

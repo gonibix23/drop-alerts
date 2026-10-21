@@ -12,7 +12,7 @@ cd drop-alerts
 docker build -t drop-alerts:1.0.0 .
 ```
 
-`compose.yaml` usa una imagen existente. No depende de que Portainer admita `build:` desde su editor. Si construyes en otro equipo, publica una etiqueta versionada en tu registro y cambia `DROP_ALERTS_IMAGE`; añade las credenciales del registro en Portainer si son necesarias. La arquitectura de la imagen debe coincidir con el host.
+`docker-compose.yml` usa una imagen existente. No depende de que Portainer admita `build:` desde su editor. Si construyes en otro equipo, publica una etiqueta versionada en tu registro y cambia `DROP_ALERTS_IMAGE`; añade las credenciales del registro en Portainer si son necesarias. La arquitectura de la imagen debe coincidir con el host.
 
 La imagen final contiene el paquete instalado y la configuración predeterminada, sin pruebas, documentación ni herramientas de compilación. Ejecuta como UID/GID `10001:10001`, con raíz de solo lectura y `/tmp` temporal. SQLite y el latido se escriben en `/data`. La fase de construcción exige ruedas binarias para las dependencias: si una arquitectura no dispone de ellas, falla explícitamente en vez de añadir compiladores a la imagen.
 
@@ -24,7 +24,7 @@ El 21 de octubre de 2026 se completó una descarga de las dependencias de ejecuc
 
 1. En Portainer selecciona el endpoint Docker adecuado.
 2. Abre **Stacks → Add stack**, escribe `drop-alerts` y elige **Web editor**.
-3. Pega el contenido de `compose.yaml`.
+3. Pega el contenido de `docker-compose.yml`.
 4. Añade las variables de `.env.example` en **Environment variables** o carga un archivo `.env` local si tu versión ofrece esa opción. Como mínimo configura `DISCORD_WEBHOOK_URL`.
 5. Revisa `LLM_BASE_URL` y `LLM_MODEL`; añade `LLM_API_KEY` solamente si el servidor la exige.
 6. Pulsa **Deploy the stack**. No necesitas puertos publicados ni otro servicio.
