@@ -1,12 +1,12 @@
 # Drop Alerts
 
-Servicio de alertas con adaptadores independientes, estado en SQLite, cola persistente y notificaciones por webhook de Discord. Empieza con Secret Lair EU y las noticias oficiales de Magic. El modelo remoto interpreta contenido ambiguo; el código conserva la autoridad sobre consultas, precios, disponibilidad, reglas, deduplicación y envíos.
+Servicio de alertas con adaptadores independientes, estado en SQLite, cola persistente y notificaciones por webhook de Discord. Vigila Secret Lair EU, Chaos Vault, anuncios de Magic, Bluesky oficial de Secret Lair, WPN, MagicCon y WeeklyMTG. El modelo remoto interpreta contenido ambiguo; el código conserva la autoridad sobre consultas, precios, disponibilidad, reglas, deduplicación y envíos.
 
 El contenedor usa Python 3.12 slim, un único servicio y un volumen. No publica puertos y no incluye ningún modelo, navegador ni servidor de inferencia.
 
 El estado de esta entrega y las comprobaciones realizadas están en [verificación](docs/verification.md). Si recibes el proyecto como ZIP, extráelo como `drop-alerts` y entra en esa carpeta en lugar de ejecutar `git clone`.
 
-La [investigación ampliada de fuentes](docs/source-expansion-research.md) compara canales oficiales, redes, boletines, medios y calendarios para anticipar Secret Lair y drops especiales. Incluye rutas comprobadas, prioridades y límites. Las nuevas fuentes son propuestas; el monitor sigue utilizando las dos integraciones iniciales.
+Consulta las [fuentes implementadas y sus intervalos](docs/announcement-sources.md). La [investigación ampliada](docs/source-expansion-research.md) conserva la revisión original y otros candidatos; que una fuente aparezca investigada no significa que esté activada.
 
 ## Arranque con Docker
 
@@ -26,6 +26,18 @@ docker compose logs --tail=100 -f
 La primera comprobación correcta de cada fuente establece una referencia silenciosa (`BOOTSTRAP_MODE=silent`). Las siguientes comprobaciones generan eventos por novedades y cambios reales. Un fallo de extracción conserva el estado anterior; que un producto no aparezca en una lista no demuestra que esté agotado.
 
 Para Portainer, usa el repositorio `https://github.com/gonibix23/drop-alerts.git`, configura `DISCORD_WEBHOOK_URL` en las variables del stack y despliega. El modo Repository obtiene el Dockerfile y el código necesarios para construir; pegar solamente el YAML en Web editor no aporta esos archivos. La variable antigua `DROP_ALERTS_IMAGE` ya no se utiliza en el Compose predeterminado y puedes eliminarla. La imagen privada de GHCR se conserva como alternativa opcional; el procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
+
+Para actualizar un stack existente en Portainer, abre el stack creado desde Repository y utiliza **Pull and redeploy** para obtener `main` y reconstruir con `docker-compose.yml`. Conserva el volumen `drop_alerts_data`: al arrancar se aplica automáticamente la migración aditiva de SQLite de esquema 1 a 2, sin borrar estados, colas ni entregas. Mantén `BOOTSTRAP_MODE=silent`; las fuentes nuevas y los inventarios ampliados de Magic se incorporan sin avisos históricos. Si montas un TOML antiguo, incorpora los nuevos bloques de fuentes y reglas desde el ejemplo: ese archivo sustituye las listas predeterminadas.
+
+## Anuncios y Discord
+
+Hay siete fuentes oficiales activadas por defecto. Secret Lair EU, Chaos Vault, Magic y Bluesky siguen `POLL_INTERVAL_SECONDS` (300 segundos inicialmente); WPN y WeeklyMTG se revisan cada 15 minutos y MagicCon cada 30. Magic amplía la portada con la categoría de anuncios, el sitemap y revisiones de artículos guardados. Los medios MagicSpoiler, MTGGoldfish, MTGDrops y Star City Games están disponibles como fuentes opcionales, desactivadas inicialmente.
+
+Las notificaciones usan tarjetas con color e icono según el evento, título enlazado, extracto de la fuente, región, fecha y una imagen cuando el adaptador la ha extraído de la fuente. Los precios y la disponibilidad se muestran cuando hay datos admitidos por el programa; un anuncio no prueba que un producto ya esté a la venta. El texto conserva el idioma de la fuente y las etiquetas están en español. Las menciones siguen desactivadas.
+
+Puedes abrir la [vista previa HTML](docs/discord-preview.html) en tu navegador o consultar el [JSON de ejemplo](docs/examples/discord-announcement.json). Ambos usan datos ficticios y no envían mensajes.
+
+La deduplicación entre fuentes reconoce publicaciones que enlazan el mismo artículo oficial. No fusiona automáticamente campañas por títulos parecidos: dos anuncios diferentes, una revelación y un producto de tienda pueden generar eventos distintos. La [guía de fuentes](docs/announcement-sources.md) explica esa cobertura y sus límites.
 
 ## Modelo remoto
 
@@ -55,7 +67,7 @@ Si el servidor exige autenticación, define `LLM_API_KEY` mediante variables pro
 
 ## Configuración
 
-[.env.example](.env.example) reúne las opciones. Las variables se validan al arrancar. Para personalizar fuentes y reglas, copia [config.example.toml](config.example.toml), edítalo y móntalo en `/app/config.toml`. Las reglas filtran por fuente, categoría, tipo de evento y palabras clave. Las palabras clave se comprueban sin distinguir mayúsculas. Revisa [cómo ampliar el sistema](docs/extending.md).
+[.env.example](.env.example) reúne las opciones. Las variables se validan al arrancar. Para personalizar fuentes y reglas, copia [config.example.toml](config.example.toml), edítalo, móntalo en `/app/config.toml` y configura `CONFIG_PATH=/app/config.toml`. Cada fuente admite `interval_seconds`; si lo omites, utiliza `POLL_INTERVAL_SECONDS`. Las reglas filtran por fuente, categoría, tipo de evento y palabras clave. Las palabras clave se comprueban sin distinguir mayúsculas. Revisa [cómo ampliar el sistema](docs/extending.md).
 
 | Grupo | Opciones principales |
 | --- | --- |

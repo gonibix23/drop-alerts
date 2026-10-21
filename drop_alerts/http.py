@@ -25,6 +25,7 @@ class SourceHTTP:
         self.timeout = timeout
         self._cache: OrderedDict[str, dict] = OrderedDict()
         self._last_request: dict[str, float] = {}
+        self._host_locks: dict[str, asyncio.Lock] = {}
         self._cooldowns: dict[str, float] = {}
 
     async def get(self, url: str) -> str:
@@ -38,7 +39,7 @@ class SourceHTTP:
     async def _get(self, url: str, redirects: int = 0) -> str:
         url = safe_url(url)
         cached = self.store.get_http_cache(url) if self.store else self._cache.get(url)
-        headers = {"User-Agent": "drop-alerts/1.0 (self-hosted source monitoring)"}
+        headers = {"User-Agent": "drop-alerts/1.1 (self-hosted source monitoring)"}
         if cached:
             if cached.get("etag"):
                 headers["If-None-Match"] = cached["etag"]
@@ -50,10 +51,13 @@ class SourceHTTP:
         if float(until) > time.time():
             raise ExtractionError("Fuente en pausa por límite de frecuencia")
         for attempt in range(self.retries + 1):
-            delay = self.min_request_interval - (time.monotonic() - self._last_request.get(host, 0))
-            if delay > 0:
-                await asyncio.sleep(delay)
-            self._last_request[host] = time.monotonic()
+            # Independent adapters may share one host (shop and Chaos Vault).
+            # Reserve request slots atomically while keeping response reads concurrent.
+            async with self._host_locks.setdefault(host, asyncio.Lock()):
+                delay = self.min_request_interval - (time.monotonic() - self._last_request.get(host, 0))
+                if delay > 0:
+                    await asyncio.sleep(delay)
+                self._last_request[host] = time.monotonic()
             try:
                 # Follow only bounded same-origin redirects, checked before each request.
                 async with self.client.stream("GET", url, headers=headers, follow_redirects=False,

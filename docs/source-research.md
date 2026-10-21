@@ -1,5 +1,7 @@
 # Investigación de fuentes oficiales
 
+Este documento conserva la comprobación de las integraciones originales. La cobertura actual de la versión 1.1 se describe en [fuentes implementadas](announcement-sources.md).
+
 Comprobado el **21 de octubre de 2026** desde el entorno de desarrollo, con peticiones HTTPS de solo lectura y verificación TLS. La herramienta web devolvía 403 para Secret Lair; una petición HTTP directa autorizada devolvió 200. Esto no demuestra conectividad desde Proxmox.
 
 ## Secret Lair EU

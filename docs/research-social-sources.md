@@ -1,6 +1,6 @@
 # Investigación de redes sociales, vídeo y correo oficiales
 
-Revisión: **21 de octubre de 2026**. Comprobaciones HTTP realizadas entre las 20:42 y las 20:45 UTC, con TLS verificado, sin navegador completo, sin iniciar sesión y sin enviar formularios. Este documento propone fuentes futuras; **no activa nuevos monitores** ni acredita entregas de correo o Discord.
+Revisión: **21 de octubre de 2026**. Comprobaciones HTTP realizadas entre las 20:42 y las 20:45 UTC, con TLS verificado, sin navegador completo, sin iniciar sesión y sin enviar formularios. Se conserva la investigación previa a la ampliación. **Estado actual:** Bluesky oficial de Secret Lair y WeeklyMTG ya tienen adaptadores activados dentro de las siete fuentes oficiales; consulta las [fuentes implementadas](announcement-sources.md). Las propuestas restantes de este documento no implican acceso a correo, suscripciones ni entregas de Discord.
 
 ## Conclusión práctica
 

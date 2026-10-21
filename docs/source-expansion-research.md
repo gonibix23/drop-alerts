@@ -2,7 +2,7 @@
 
 Investigación realizada el **21 de octubre de 2026**, con prioridad en España/UE. Se revisaron las fuentes del servicio, páginas oficiales, canales sociales, feeds editoriales y calendarios comunitarios. No es un inventario exhaustivo de Internet: las colaboraciones y exclusivas pueden anunciarse en canales nuevos.
 
-**Estado del servicio:** siguen implementadas y activadas por defecto `secret_lair_eu` y `magic_news`. Este documento y sus anexos son investigación y propuestas de ampliación; no activan adaptadores nuevos ni suscripciones.
+**Estado actual del servicio:** están activadas por defecto siete fuentes oficiales: Secret Lair EU, Magic ampliado, Chaos Vault EU, Bluesky de Secret Lair, WPN, MagicCon y WeeklyMTG. Hay además cuatro feeds secundarios implementados y desactivados. Consulta las [fuentes implementadas e instrucciones de actualización](announcement-sources.md). El resto de este informe y sus anexos conserva la investigación original previa a la ampliación, con sus prioridades, capturas y candidatos adicionales; sus propuestas no significan que todos esos canales estén implementados ni implican suscripciones.
 
 ## Conclusión
 

@@ -1,0 +1,50 @@
+{
+  "allowed_mentions": {
+    "parse": [],
+    "users": [],
+    "roles": [],
+    "replied_user": false
+  },
+  "embeds": [
+    {
+      "author": {
+        "name": "📣 Nuevo anuncio"
+      },
+      "title": "EJEMPLO FICTICIO · Secret Lair: próxima colaboración",
+      "description": "Este es un aviso de muestra para ver el diseño. Un anuncio real mostraría aquí el resumen extraído de su fuente.",
+      "color": 10186239,
+      "footer": {
+        "text": "Drop Alerts · ejemplo-no-…"
+      },
+      "url": "https://bsky.app/profile/mtgsecretlair.com",
+      "timestamp": "2026-10-21T20:00:00+00:00",
+      "fields": [
+        {
+          "name": "📡 Fuente",
+          "value": "Secret Lair · Bluesky oficial",
+          "inline": true
+        },
+        {
+          "name": "🌍 Región",
+          "value": "Internacional",
+          "inline": true
+        },
+        {
+          "name": "📍 Estado",
+          "value": "Anunciado",
+          "inline": true
+        },
+        {
+          "name": "🕒 Detectado",
+          "value": "21/10/2026 · 22:00 CEST",
+          "inline": true
+        },
+        {
+          "name": "🔗 Detalles",
+          "value": "[Abrir anuncio ↗](<https://bsky.app/profile/mtgsecretlair.com>)",
+          "inline": false
+        }
+      ]
+    }
+  ]
+}

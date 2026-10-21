@@ -6,6 +6,42 @@ enabled = true
 [sources.magic_news]
 enabled = true
 
+[sources.chaos_vault_eu]
+enabled = true
+
+[sources.secret_lair_bluesky]
+enabled = true
+
+[sources.wpn_news]
+enabled = true
+interval_seconds = 900
+
+[sources.magiccon_news]
+enabled = true
+interval_seconds = 1800
+
+[sources.weekly_mtg]
+enabled = true
+interval_seconds = 900
+
+# Medios secundarios: adaptadores disponibles, apagados por defecto.
+# Sus anuncios no prueban stock ni precio EU.
+[sources.magicspoiler]
+enabled = false
+interval_seconds = 900
+
+[sources.mtggoldfish]
+enabled = false
+interval_seconds = 900
+
+[sources.mtgdrops]
+enabled = false
+interval_seconds = 900
+
+[sources.scg_news]
+enabled = false
+interval_seconds = 1800
+
 # Los filtros de una regla se combinan con AND; valores dentro de un filtro, OR.
 # Una lista vacía no restringe ese campo. Al menos una regla debe coincidir.
 [[rules]]
@@ -23,5 +59,15 @@ enabled = true
 sources = ["magic_news"]
 kinds = []
 event_types = []
-keywords = ["secret lair"]
+keywords = ["secret lair", "chaos vault", "festival in a box", "secret gallery", "roadshow", "zeta set", "countdown kit"]
+require_analysis = false
+
+[[rules]]
+id = "official-special-announcements"
+sources = ["chaos_vault_eu", "secret_lair_bluesky", "wpn_news", "magiccon_news", "weekly_mtg"]
+require_analysis = false
+
+[[rules]]
+id = "secondary-special-announcements"
+sources = ["magicspoiler", "mtggoldfish", "mtgdrops", "scg_news"]
 require_analysis = false

@@ -1,6 +1,6 @@
 # Investigación de fuentes oficiales para drops de Magic
 
-Comprobación: **21 de octubre de 2026**. Este documento recoge fuentes candidatas y métodos observados; no activa nuevos monitores. La configuración actual del proyecto continúa teniendo dos fuentes: Secret Lair EU y las noticias de Magic. La investigación de redes sociales, correo y medios se documenta por separado.
+Comprobación: **21 de octubre de 2026**. Este documento conserva la investigación anterior a la ampliación y sus métodos observados; las prioridades y referencias a cobertura de su cuerpo describen aquella captura. **Estado actual:** hay siete fuentes oficiales activadas por defecto, incluidos Chaos Vault, Bluesky, WPN, MagicCon y WeeklyMTG, además de Secret Lair EU y Magic ampliado. Consulta las [fuentes implementadas](announcement-sources.md) para conocer adaptadores, intervalos y límites actuales. La investigación de redes sociales, correo y medios se documenta por separado.
 
 Se realizaron peticiones HTTP de lectura y se examinó el HTML recibido, sin navegador completo, registro de cuentas ni suscripciones. `HTTP 200` significa que esa URL respondió durante la investigación, no que exista ya un adaptador de producción. Las comprobaciones con el lector web se distinguen de las peticiones directas de la aplicación. Los cuerpos y resultados de trabajo se conservaron en `work/research/official/`; no son necesarios en la imagen de ejecución.
 

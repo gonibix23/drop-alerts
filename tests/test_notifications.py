@@ -35,7 +35,7 @@ def test_discord_payload_mentions_facts_and_uncertainty():
     assert payload["allowed_mentions"]["parse"] == []
     assert payload["allowed_mentions"]["users"] == []
     encoded = json.dumps(payload, ensure_ascii=False)
-    assert "39.99 EUR" in encoded and "AVAILABLE" in encoded
+    assert "39.99 EUR" in encoded and "Disponible" in encoded
     assert "999" not in encoded and "UNAVAILABLE" not in encoded and "evil.test" not in encoded
     assert "incierta" in encoded
     assert "sin verificar" in encoded

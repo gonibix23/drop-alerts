@@ -1,0 +1,115 @@
+{
+  "filters": [
+    {
+      "products": [
+        {
+          "productID": "1246222",
+          "descriptions": [
+            {
+              "lang": "FR",
+              "title": "The Oddlands: Plains Foil Edition",
+              "home_title": ""
+            },
+            {
+              "lang": "EN",
+              "title": "The Oddlands: Plains Foil Edition",
+              "home_title": ""
+            },
+            {
+              "lang": "ES",
+              "title": "The Oddlands: Plains Foil Edition",
+              "home_title": ""
+            },
+            {
+              "lang": "DE",
+              "title": "The Oddlands: Plains Foil Edition",
+              "home_title": ""
+            },
+            {
+              "lang": "IT",
+              "title": "The Oddlands: Plains Foil Edition",
+              "home_title": ""
+            }
+          ],
+          "image": "https://cdn-prod.scalefast.com/public/assets/user/10751401/image/4c90b4817bc4d2c4b88409eb8c7e178f.png",
+          "stock": {
+            "stock": "4",
+            "ostock": "DENY_PURCHASE"
+          },
+          "price_info": {
+            "currencies_list": [
+              "EUR"
+            ],
+            "currencies": {
+              "EUR": [
+                {
+                  "price": "44.99"
+                }
+              ]
+            },
+            "prices": [
+              {
+                "licence": "EUR",
+                "price": "44.99"
+              }
+            ]
+          }
+        },
+        {
+          "productID": "1246223",
+          "descriptions": [
+            {
+              "lang": "FR",
+              "title": "The Oddlands: Plains",
+              "home_title": ""
+            },
+            {
+              "lang": "EN",
+              "title": "The Oddlands: Plains",
+              "home_title": ""
+            },
+            {
+              "lang": "ES",
+              "title": "The Oddlands: Plains",
+              "home_title": ""
+            },
+            {
+              "lang": "DE",
+              "title": "The Oddlands: Plains",
+              "home_title": ""
+            },
+            {
+              "lang": "IT",
+              "title": "The Oddlands: Plains",
+              "home_title": ""
+            }
+          ],
+          "image": "https://cdn-prod.scalefast.com/public/assets/user/10751401/image/516d5c0ee2450d558248ffd854b14b02.png",
+          "stock": {
+            "stock": 10,
+            "ostock": "DENY_PURCHASE"
+          },
+          "price_info": {
+            "currencies_list": [
+              "EUR"
+            ],
+            "currencies": {
+              "EUR": [
+                {
+                  "price": "34.99"
+                }
+              ]
+            },
+            "prices": [
+              {
+                "licence": "EUR",
+                "price": "34.99"
+              }
+            ]
+          }
+        }
+      ],
+      "total": 2
+    }
+  ]
+}

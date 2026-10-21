@@ -64,7 +64,7 @@ docker exec "$container" python -c '
 import os, sqlite3
 assert os.getuid() == 10001
 db = sqlite3.connect("/data/drop-alerts.db")
-assert db.execute("SELECT value FROM meta WHERE key=?", ("schema_version",)).fetchone() == ("1",)
+assert db.execute("SELECT value FROM meta WHERE key=?", ("schema_version",)).fetchone() == ("2",)
 db.execute("INSERT OR REPLACE INTO meta(key,value) VALUES(?,?)", ("container_smoke", "retained"))
 db.commit()
 db.close()

@@ -27,10 +27,8 @@ def health(settings) -> bool:
 async def doctor(settings) -> int:
     """Read-only connectivity probe. Never send a Discord message or inference."""
     from urllib.parse import urlsplit
-    targets = [
-        ("secret_lair_eu", "https://secretlair.wizards.com/eu/", {}),
-        ("magic_news", "https://magic.wizards.com/en/news", {}),
-    ]
+    from .registry import build_sources
+    targets = [(source.id, source.url, {}) for source in build_sources(settings, None)]
     if settings.llm_enabled:
         headers = {"Authorization": "Bearer " + settings.llm_api_key} if settings.llm_api_key else {}
         targets.append(("llm_models", settings.llm_base_url + "/models", headers))

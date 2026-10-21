@@ -37,8 +37,20 @@ class Monitor:
             self.store.source_error(source.id, code)
             log.warning("Fuente %s: %s", source.id, code)
 
-    async def tick(self):
-        await asyncio.gather(*(self.check(source) for source in self.sources))
+    async def tick(self, force=False):
+        due = []
+        now = time.time()
+        for source in self.sources:
+            interval = self.settings.sources.get(source.id, {}).get("interval_seconds", self.settings.poll_interval_seconds)
+            marker = "source_next_check:" + source.id
+            try:
+                next_check = float(self.store.get_meta(marker, 0))
+            except (ValueError, TypeError):
+                next_check = 0
+            if force or next_check <= now:
+                self.store.set_meta(marker, str(now + interval))
+                due.append(source)
+        await asyncio.gather(*(self.check(source) for source in due))
 
 
 class AnalysisWorker:
@@ -63,7 +75,7 @@ def heartbeat(settings):
     path = Path(settings.heartbeat_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps({"timestamp": time.time(), "version": "1.0.0"}), encoding="utf-8")
+    temporary.write_text(json.dumps({"timestamp": time.time(), "version": "1.1.0"}), encoding="utf-8")
     temporary.replace(path)
 
 
@@ -84,7 +96,7 @@ async def run(settings, store, once: bool = False):
         analyses = AnalysisWorker(settings, store, LLMAnalyzer(settings, store, ai_client))
         notifications = NotificationWorker(settings, store, DiscordChannel(settings, store, discord_client))
         if once:
-            await monitor.tick()
+            await monitor.tick(force=True)
             await analyses.tick()
             await notifications.tick()
             # A one-shot run must not make a stopped daemon appear healthy.
@@ -110,8 +122,9 @@ async def run(settings, store, once: bool = False):
         async def prune():
             store.prune(settings.retention_days)
 
+        monitor_interval = min([settings.poll_interval_seconds] + [settings.sources.get(source.id, {}).get("interval_seconds", settings.poll_interval_seconds) for source in monitor.sources])
         tasks = [asyncio.create_task(periodic(name, action, interval)) for name, action, interval in (
-            ("monitor", monitor.tick, settings.poll_interval_seconds),
+            ("monitor", monitor.tick, monitor_interval),
             ("analysis", analyses.tick, 10), ("notifications", notifications.tick, 2),
             ("heartbeat", beat, 10), ("retention", prune, 86400),
         )]

@@ -8,6 +8,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .models import Event, FetchResult, Item, canonical_json, fingerprint, utcnow
+from .identities import announcement_url
 
 
 class Store:
@@ -44,11 +45,30 @@ class Store:
         CREATE TABLE IF NOT EXISTS event_jobs(event_id TEXT PRIMARY KEY REFERENCES events(id),job_id TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS diagnostics(id INTEGER PRIMARY KEY,component TEXT,code TEXT,detail TEXT,created REAL);
         CREATE TABLE IF NOT EXISTS http_cache(url TEXT PRIMARY KEY,body TEXT,etag TEXT,last_modified TEXT,created REAL);
+        CREATE TABLE IF NOT EXISTS announcement_claims(identity TEXT PRIMARY KEY,event_id TEXT NOT NULL,created REAL NOT NULL);
         INSERT OR IGNORE INTO meta VALUES('schema_version','1');
         """)
         version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[0]
-        if version != "1":
+        if version not in ("1", "2"):
             raise RuntimeError("Versión de base de datos no compatible")
+        if version == "1":
+            # Additive migration: preserve historical deliveries and silent baseline
+            # identities before enabling feeds that may reference those articles.
+            with self.transaction():
+                rows = self.db.execute("SELECT id,payload,item_id FROM events WHERE event_type IN ('publication.new','announcement.new') ORDER BY created").fetchall()
+                for row in rows:
+                    event = Event(**json.loads(row["payload"])) if row["payload"] else None
+                    identity = self.announcement_identity(event) if event else announcement_url(row["item_id"])
+                    if identity:
+                        self.db.execute("INSERT OR IGNORE INTO announcement_claims VALUES(?,?,?)", (identity, row["id"], time.time()))
+                self.db.execute("UPDATE meta SET value='2' WHERE key='schema_version'")
+
+    @staticmethod
+    def announcement_identity(event: Event) -> str | None:
+        if event.event_type not in ("announcement.new", "publication.new"):
+            return None
+        data = event.data["current"].get("data", {})
+        return announcement_url(data.get("announcement_url", "")) or announcement_url(event.url)
 
     def close(self):
         self.db.close()
@@ -106,6 +126,17 @@ class Store:
             self.db.execute("INSERT OR IGNORE INTO sources(id) VALUES(?)", (source,))
             initialized = self.db.execute("SELECT initialized FROM sources WHERE id=?", (source,)).fetchone()[0]
             silent = not initialized and settings.bootstrap_mode == "silent"
+            # A new discovery channel can expose years of articles even when the
+            # adapter's original source already has a baseline. Mark each inventory
+            # atomically, so a restart cannot import it as newly published content.
+            for channel, identities in result.metadata.get("discovery_inventories", {}).items():
+                marker = f"source_inventory:{source}:{channel}"
+                if not self.get_meta(marker):
+                    if settings.bootstrap_mode == "silent":
+                        for item_id in identities:
+                            if isinstance(item_id, str):
+                                self.db.execute("INSERT OR IGNORE INTO bootstrap_items VALUES(?,?)", (source, item_id))
+                    self.db.execute("INSERT OR REPLACE INTO meta VALUES(?,?)", (marker, "1"))
             if silent:
                 for item_id in result.metadata.get("bootstrap_ids", []):
                     if isinstance(item_id, str):
@@ -123,7 +154,14 @@ class Store:
                     decision = rules.decide(event)
                     self.db.execute("INSERT OR IGNORE INTO events VALUES(?,?,?,?,?,?,?)", (event.id, source, current.id, event.event_type, event.fingerprint, canonical_json(asdict(event)), time.time()))
                     count += 1
-                    if not silent and not historical and decision.notify:
+                    identity = self.announcement_identity(event)
+                    duplicate = False
+                    if identity and (decision.notify or silent or historical):
+                        existing = self.db.execute("SELECT event_id FROM announcement_claims WHERE identity=?", (identity,)).fetchone()
+                        duplicate = existing is not None and existing[0] != event.id
+                        if not existing:
+                            self.db.execute("INSERT INTO announcement_claims VALUES(?,?,?)", (identity, event.id, time.time()))
+                    if not silent and not historical and decision.notify and not duplicate:
                         status = "waiting_analysis" if decision.require_analysis else "pending"
                         self.db.execute("INSERT OR IGNORE INTO outbox(event_id,status) VALUES(?,?)", (event.id, status))
                         task = "change" if previous and event.event_type in ("content.changed", "change.uncertain") else "classification"

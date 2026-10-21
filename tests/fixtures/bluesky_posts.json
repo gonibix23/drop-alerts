@@ -1,0 +1,208 @@
+{
+  "feed": [
+    {
+      "post": {
+        "uri": "at://did:plc:5a2wvprzfv3cej7fxud66twr/app.bsky.feed.post/3myfjflwlh727",
+        "author": {
+          "did": "did:plc:5a2wvprzfv3cej7fxud66twr",
+          "handle": "mtgsecretlair.com",
+          "displayName": "Secret Lair",
+          "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreidcyaffpkrdthzoaih4ctdnhoml4okqgl4jcx2iuj5s2f722qlb74",
+          "associated": {
+            "activitySubscription": {
+              "allowSubscriptions": "followers"
+            }
+          },
+          "labels": [],
+          "createdAt": "2024-11-13T19:22:47.375Z"
+        },
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2026-10-21T16:00:04.185Z",
+          "embed": {
+            "$type": "app.bsky.embed.images",
+            "images": [
+              {
+                "alt": "Text reading 'What is a Bundle Bundle?' beside a fan of eight Magic cards above a box labeled 'Reality Fracture' and an open box labeled 'Secret Lair Bundle' containing Collector Boosters. This is set against a background of concentric rippling circles. Cards shown include 'Thoughtseize', 'Desperate Ritual', 'Pyroblast', 'Tribute to the World Tree', 'Attrition', 'Bitter Ordeal', 'Ophiomancer', 'Sign in Blood', and 'Soul Spike'. Below, an equation reads: 'Bundle Bundle = Duality Distorted + 怪異学校 — Strange School + Reality Fracture Secret Lair Bundle'.​",
+                "aspectRatio": {
+                  "height": 675,
+                  "width": 1200
+                },
+                "image": {
+                  "$type": "blob",
+                  "ref": {
+                    "$link": "bafkreifw2ytn3fr2laefa7eukfbs67xgukavqrm6hdsxehi25huze7fkvm"
+                  },
+                  "mimeType": "image/png",
+                  "size": 510013
+                }
+              },
+              {
+                "alt": "Secret Lair Chaos Vault: Reality Fracture Bundle Bundle promotional image with the Secret Lair logo and 'Duality Distorted' text above a fan of four Magic cards, each an echo of a classic card reimagined by its original artist: 'Thoughtseize' by DiTerlizzi, who also drew the iconic original 'Brainstorm'; 'Desperate Ritual' by Sandra Everingham, who drew the original 'Dark Ritual' and brings back the same mage; 'Pyroblast' by Mark Poole, who drew the original 'Counterspell' and shows the same wizard now casting the spell; and 'Tribute to the World Tree', reimagined by Phil Foglio from his original 'Presence of the Master'. Text below reads 'Available in the Bundle Bundle'.​",
+                "aspectRatio": {
+                  "height": 675,
+                  "width": 1200
+                },
+                "image": {
+                  "$type": "blob",
+                  "ref": {
+                    "$link": "bafkreifukygfylztgk5xdtp5jawlonxeitlfuj45yukwzmilxwqr346j6u"
+                  },
+                  "mimeType": "image/png",
+                  "size": 484835
+                }
+              },
+              {
+                "alt": "Secret Lair Chaos Vault: Reality Fracture Bundle Bundle promotional image with the Secret Lair logo and '怪異学校 — Strange School' text above a fan of five Magic cards illustrated in a black-and-white J-horror manga style: 'Attrition', 'Bitter Ordeal', 'Ophiomancer', 'Sign in Blood', and 'Soul Spike'. Text below reads 'Available in the Bundle Bundle'.​",
+                "aspectRatio": {
+                  "height": 675,
+                  "width": 1200
+                },
+                "image": {
+                  "$type": "blob",
+                  "ref": {
+                    "$link": "bafkreiextvwqy3xomebffsmmp7ac56iyphl5rmxlaaqxdzlx5wsvpkusyu"
+                  },
+                  "mimeType": "image/png",
+                  "size": 583273
+                }
+              },
+              {
+                "alt": "Secret Lair Chaos Vault: Reality Fracture Bundle Bundle promotional image with the Secret Lair logo and 'Reality Fracture Secret Lair Bundle' text, showing a closed box labeled 'Reality Fracture' beside an open box labeled 'Secret Lair Bundle' with a cosmic illustration and a Collector Booster inside. Text below reads 'Only available in the Bundle Bundle'.​",
+                "aspectRatio": {
+                  "height": 675,
+                  "width": 1200
+                },
+                "image": {
+                  "$type": "blob",
+                  "ref": {
+                    "$link": "bafkreifmpj7f6ghxzesrvqyxh3amq5try2gwbarb2nv2yo4fa3p7bljvbq"
+                  },
+                  "mimeType": "image/png",
+                  "size": 508743
+                }
+              }
+            ]
+          },
+          "facets": [],
+          "text": "Combine the Reality Fracture Secret Lair Bundle with Duality Distorted and 怪異学校 — Strange School. Choose both drops in foil, non-foil, or both with the Everything Edition. Duality Distorted and 怪異学校 — Strange School are also available individually in foil and non-foil. "
+        },
+        "embed": {
+          "images": [
+            {
+              "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreifw2ytn3fr2laefa7eukfbs67xgukavqrm6hdsxehi25huze7fkvm",
+              "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreifw2ytn3fr2laefa7eukfbs67xgukavqrm6hdsxehi25huze7fkvm",
+              "alt": "Text reading 'What is a Bundle Bundle?' beside a fan of eight Magic cards above a box labeled 'Reality Fracture' and an open box labeled 'Secret Lair Bundle' containing Collector Boosters. This is set against a background of concentric rippling circles. Cards shown include 'Thoughtseize', 'Desperate Ritual', 'Pyroblast', 'Tribute to the World Tree', 'Attrition', 'Bitter Ordeal', 'Ophiomancer', 'Sign in Blood', and 'Soul Spike'. Below, an equation reads: 'Bundle Bundle = Duality Distorted + 怪異学校 — Strange School + Reality Fracture Secret Lair Bundle'.​",
+              "aspectRatio": {
+                "height": 675,
+                "width": 1200
+              }
+            },
+            {
+              "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreifukygfylztgk5xdtp5jawlonxeitlfuj45yukwzmilxwqr346j6u",
+              "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreifukygfylztgk5xdtp5jawlonxeitlfuj45yukwzmilxwqr346j6u",
+              "alt": "Secret Lair Chaos Vault: Reality Fracture Bundle Bundle promotional image with the Secret Lair logo and 'Duality Distorted' text above a fan of four Magic cards, each an echo of a classic card reimagined by its original artist: 'Thoughtseize' by DiTerlizzi, who also drew the iconic original 'Brainstorm'; 'Desperate Ritual' by Sandra Everingham, who drew the original 'Dark Ritual' and brings back the same mage; 'Pyroblast' by Mark Poole, who drew the original 'Counterspell' and shows the same wizard now casting the spell; and 'Tribute to the World Tree', reimagined by Phil Foglio from his original 'Presence of the Master'. Text below reads 'Available in the Bundle Bundle'.​",
+              "aspectRatio": {
+                "height": 675,
+                "width": 1200
+              }
+            },
+            {
+              "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreiextvwqy3xomebffsmmp7ac56iyphl5rmxlaaqxdzlx5wsvpkusyu",
+              "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreiextvwqy3xomebffsmmp7ac56iyphl5rmxlaaqxdzlx5wsvpkusyu",
+              "alt": "Secret Lair Chaos Vault: Reality Fracture Bundle Bundle promotional image with the Secret Lair logo and '怪異学校 — Strange School' text above a fan of five Magic cards illustrated in a black-and-white J-horror manga style: 'Attrition', 'Bitter Ordeal', 'Ophiomancer', 'Sign in Blood', and 'Soul Spike'. Text below reads 'Available in the Bundle Bundle'.​",
+              "aspectRatio": {
+                "height": 675,
+                "width": 1200
+              }
+            },
+            {
+              "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreifmpj7f6ghxzesrvqyxh3amq5try2gwbarb2nv2yo4fa3p7bljvbq",
+              "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreifmpj7f6ghxzesrvqyxh3amq5try2gwbarb2nv2yo4fa3p7bljvbq",
+              "alt": "Secret Lair Chaos Vault: Reality Fracture Bundle Bundle promotional image with the Secret Lair logo and 'Reality Fracture Secret Lair Bundle' text, showing a closed box labeled 'Reality Fracture' beside an open box labeled 'Secret Lair Bundle' with a cosmic illustration and a Collector Booster inside. Text below reads 'Only available in the Bundle Bundle'.​",
+              "aspectRatio": {
+                "height": 675,
+                "width": 1200
+              }
+            }
+          ],
+          "$type": "app.bsky.embed.images#view"
+        }
+      }
+    },
+    {
+      "post": {
+        "uri": "at://did:plc:5a2wvprzfv3cej7fxud66twr/app.bsky.feed.post/3mwtihsozgc2i",
+        "author": {
+          "did": "did:plc:5a2wvprzfv3cej7fxud66twr",
+          "handle": "mtgsecretlair.com",
+          "displayName": "Secret Lair",
+          "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreidcyaffpkrdthzoaih4ctdnhoml4okqgl4jcx2iuj5s2f722qlb74",
+          "associated": {
+            "activitySubscription": {
+              "allowSubscriptions": "followers"
+            }
+          },
+          "labels": [],
+          "createdAt": "2024-11-13T19:22:47.375Z"
+        },
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2026-10-01T18:30:17.922Z",
+          "embed": {
+            "$type": "app.bsky.embed.images",
+            "images": [
+              {
+                "alt": "",
+                "aspectRatio": {
+                  "height": 1194,
+                  "width": 1194
+                },
+                "image": {
+                  "$type": "blob",
+                  "ref": {
+                    "$link": "bafkreibkerirs6vuxcdlavtil5hx3rxlnp3csvftor76omrtaqgxgaydb4"
+                  },
+                  "mimeType": "image/jpeg",
+                  "size": 1218929
+                }
+              }
+            ]
+          },
+          "facets": [
+            {
+              "features": [
+                {
+                  "$type": "app.bsky.richtext.facet#link",
+                  "uri": "https://magic.wizards.com/en/news/announcements/an-update-on-the-zeta-set-sale"
+                }
+              ],
+              "index": {
+                "byteEnd": 65,
+                "byteStart": 32
+              }
+            }
+          ],
+          "langs": [
+            "en"
+          ],
+          "text": "An Update on the Zeta Set Sale:\nmagic.wizards.com/en/news/anno..."
+        },
+        "embed": {
+          "images": [
+            {
+              "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreibkerirs6vuxcdlavtil5hx3rxlnp3csvftor76omrtaqgxgaydb4",
+              "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:5a2wvprzfv3cej7fxud66twr/bafkreibkerirs6vuxcdlavtil5hx3rxlnp3csvftor76omrtaqgxgaydb4",
+              "alt": "",
+              "aspectRatio": {
+                "height": 1194,
+                "width": 1194
+              }
+            }
+          ],
+          "$type": "app.bsky.embed.images#view"
+        }
+      }
+    }
+  ]
+}

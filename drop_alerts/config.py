@@ -47,10 +47,22 @@ class Settings:
     retention_days: int = 90
     source_max_bytes: int = 2000000
     source_max_items: int = 100
-    sources: dict = field(default_factory=lambda: {"secret_lair_eu": {"enabled": True}, "magic_news": {"enabled": True}})
+    sources: dict = field(default_factory=lambda: {
+        "secret_lair_eu": {"enabled": True}, "magic_news": {"enabled": True},
+        "chaos_vault_eu": {"enabled": True}, "secret_lair_bluesky": {"enabled": True},
+        "wpn_news": {"enabled": True, "interval_seconds": 900},
+        "magiccon_news": {"enabled": True, "interval_seconds": 1800},
+        "weekly_mtg": {"enabled": True, "interval_seconds": 900},
+        "magicspoiler": {"enabled": False, "interval_seconds": 900},
+        "mtggoldfish": {"enabled": False, "interval_seconds": 900},
+        "mtgdrops": {"enabled": False, "interval_seconds": 900},
+        "scg_news": {"enabled": False, "interval_seconds": 1800},
+    })
     rules: list[dict] = field(default_factory=lambda: [
         {"id": "store", "sources": ["secret_lair_eu"]},
-        {"id": "secret-lair-news", "sources": ["magic_news"], "keywords": ["secret lair"]},
+        {"id": "secret-lair-news", "sources": ["magic_news"], "keywords": ["secret lair", "chaos vault", "festival in a box", "secret gallery", "roadshow", "zeta set", "countdown kit"]},
+        {"id": "official-special-announcements", "sources": ["chaos_vault_eu", "secret_lair_bluesky", "wpn_news", "magiccon_news", "weekly_mtg"]},
+        {"id": "secondary-special-announcements", "sources": ["magicspoiler", "mtggoldfish", "mtgdrops", "scg_news"]},
     ])
 
     @classmethod
@@ -121,7 +133,9 @@ class Settings:
         if set(self.sources) - SOURCE_FACTORIES.keys():
             raise ValueError("Adaptador sin registrar; añade el módulo en registry.py")
         for cfg in self.sources.values():
-            if not isinstance(cfg, dict) or set(cfg) - {"enabled"} or not isinstance(cfg.get("enabled", True), bool):
+            if not isinstance(cfg, dict) or set(cfg) - {"enabled", "interval_seconds"} or not isinstance(cfg.get("enabled", True), bool):
                 raise ValueError("Opciones de fuente inválidas")
+            if "interval_seconds" in cfg and (type(cfg["interval_seconds"]) is not int or not 30 <= cfg["interval_seconds"] <= 86400):
+                raise ValueError("interval_seconds debe ser un entero entre 30 y 86400")
         from .rules import RuleEngine
         RuleEngine(self.rules)

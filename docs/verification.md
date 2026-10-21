@@ -2,7 +2,17 @@
 
 Comprobado el 21 de octubre de 2026. El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts).
 
-## Ejecutado correctamente
+## Actualización 1.1: anuncios y Discord
+
+- `python -m pytest -q --basetemp work/pytest-release-1-1`: **267 pruebas aprobadas**, Python 3.14 en Windows. Incluyen las siete fuentes, RSS/Atom secundarios, inventarios silenciosos en bases existentes, migración 1→2, deduplicación entre fuentes, planificación, límites HTTP compartidos y presentación de Discord. No requieren servicios externos.
+- Comprobación HTTPS real conjunta, con TLS verificado, de las **siete fuentes oficiales** usando una SQLite en memoria, IA desactivada y ningún webhook: todas extrajeron contenido sin errores parciales. El arranque silencioso dejó **0 notificaciones pendientes**. Se limitaron los detalles para esta prueba; los recuentos no representan una exploración completa.
+- Consultas específicas comprobaron el catálogo de Chaos Vault, artículos WPN/MagicCon y descubrimiento de Countdown Kit fuera de la portada de Magic. Los cuatro feeds secundarios también se reprodujeron desde capturas guardadas.
+- `python -m pip check`: sin incompatibilidades. `docker compose --env-file .env.example config --quiet`: configuración válida. La construcción local sigue sin ser posible porque no existe el pipe del motor Docker; la configuración se comprobó también con una ruta aislada de Docker.
+- La vista previa de Discord contiene datos ficticios. No se envió ningún mensaje real, no se accedió a Proxmox/Portainer y no se hizo una inferencia autenticada nueva.
+
+Los límites de cobertura y el procedimiento de actualización se describen en [fuentes implementadas](announcement-sources.md). El resultado de construcción y ejecución del contenedor para cada commit se consulta en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions); las comprobaciones históricas siguientes corresponden a versiones anteriores.
+
+## Verificación inicial 1.0
 
 - Instalación del paquete y dependencias de desarrollo en un entorno aislado.
 - `python -m pytest -q --basetemp work/pytest-final-complete`: **124 pruebas aprobadas**, Python 3.14 en Windows. Las pruebas no hacen peticiones reales ni publican en Discord.

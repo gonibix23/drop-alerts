@@ -1,0 +1,44 @@
+<rss xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:ns1="http://purl.org/rss/1.0/modules/syndication/" version="2.0">
+
+<channel>
+	<title>Magic Spoiler – Latest MTG Visual Spoilers</title>
+	<ns0:link href="https://www.magicspoiler.com/feed/" rel="self" type="application/rss+xml" />
+	<link>https://www.magicspoiler.com/</link>
+	<description>A Magic: the Gathering Spoiler site</description>
+	<lastBuildDate>Wed, 21 Oct 2026 13:28:24 +0000</lastBuildDate>
+	<language>en-US</language>
+	<ns1:updatePeriod>
+	hourly	</ns1:updatePeriod>
+	<ns1:updateFrequency>
+	1	</ns1:updateFrequency>
+	<generator>https://wordpress.org/?v=6.9.10</generator>
+	<item>
+		<title>Star Trek Commander Decks</title>
+		<link>https://www.magicspoiler.com/mtg-news/star-trek-commander-decks/</link>
+
+		<pubDate>Wed, 21 Oct 2026 13:28:24 +0000</pubDate>
+				<guid isPermaLink="false">https://www.magicspoiler.com/?p=105246</guid>
+
+					<description>&lt;p&gt;Star Trek Commander Decks&lt;/p&gt;
+&lt;p&gt;The post &lt;a href="https://www.magicspoiler.com/mtg-news/star-trek-commander-decks/"&gt;Star Trek Commander Decks&lt;/a&gt; appeared first on &lt;a href="https://www.magicspoiler.com"&gt;Magic Spoiler - Latest MTG Visual Spoilers&lt;/a&gt;.&lt;/p&gt;
+</description>
+
+
+
+			</item>
+		<item>
+		<title>Secret Lair Countdown Kit: Marvel’s History of Heroes</title>
+		<link>https://www.magicspoiler.com/mtg-news/secret-lair-countdown-kit-marvels-history-of-heroes/</link>
+
+		<pubDate>Fri, 16 Oct 2026 16:46:18 +0000</pubDate>
+				<guid isPermaLink="false">https://www.magicspoiler.com/?p=104849</guid>
+
+					<description>&lt;p&gt;Each copy of Secret Lair Countdown Kit: Marvel&amp;#8217;s History of Heroes contains 30 individually packaged Magic cards, each of which represents an era or moment from the history of the Marvel Universe. These cards randomly appear in non-foil, foil, or—when the stars and spells align—surge foil. Price: $199.99 USD November 2, 2026, only on MagicSecretLair.com&lt;/p&gt;
+&lt;p&gt;The post &lt;a href="https://www.magicspoiler.com/mtg-news/secret-lair-countdown-kit-marvels-history-of-heroes/"&gt;Secret Lair Countdown Kit: Marvel&amp;#8217;s History of Heroes&lt;/a&gt; appeared first on &lt;a href="https://www.magicspoiler.com"&gt;Magic Spoiler - Latest MTG Visual Spoilers&lt;/a&gt;.&lt;/p&gt;
+</description>
+
+
+
+			</item>
+		</channel>
+</rss>

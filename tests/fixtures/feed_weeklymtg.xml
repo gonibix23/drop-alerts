@@ -1,0 +1,58 @@
+<ns0:feed xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:ns1="http://www.youtube.com/xml/schemas/2015" xmlns:ns2="http://search.yahoo.com/mrss/">
+ <ns0:link rel="self" href="http://www.youtube.com/feeds/videos.xml?playlist_id=PL3rP64NRtmbjdg_j75RqbTu5Ffpc-Q_9s" />
+ <ns0:id>yt:playlist:PL3rP64NRtmbjdg_j75RqbTu5Ffpc-Q_9s</ns0:id>
+ <ns1:playlistId>PL3rP64NRtmbjdg_j75RqbTu5Ffpc-Q_9s</ns1:playlistId>
+ <ns1:channelId>UC8ZGymAvfP97qJabgqUkz4A</ns1:channelId>
+ <ns0:title>WeeklyMTG</ns0:title>
+ <ns0:author>
+  <ns0:name>Magic: The Gathering</ns0:name>
+  <ns0:uri>https://www.youtube.com/channel/UC8ZGymAvfP97qJabgqUkz4A</ns0:uri>
+ </ns0:author>
+ <ns0:published>2018-06-08T01:54:28+00:00</ns0:published>
+ <ns0:entry>
+  <ns0:id>yt:video:aTFW5vo3yac</ns0:id>
+  <ns1:videoId>aTFW5vo3yac</ns1:videoId>
+  <ns1:channelId>UC8ZGymAvfP97qJabgqUkz4A</ns1:channelId>
+  <ns0:title>WeeklyMTG - DEBUT AFTERSHOW - Magic: The Gathering® |  Star Trek</ns0:title>
+  <ns0:link rel="alternate" href="https://www.youtube.com/watch?v=aTFW5vo3yac" />
+  <ns0:author>
+   <ns0:name>Magic: The Gathering</ns0:name>
+   <ns0:uri>https://www.youtube.com/channel/UC8ZGymAvfP97qJabgqUkz4A</ns0:uri>
+  </ns0:author>
+  <ns0:published>2026-10-20T23:58:23+00:00</ns0:published>
+  <ns0:updated>2026-10-21T20:27:10+00:00</ns0:updated>
+  <ns2:group>
+   <ns2:title>WeeklyMTG - DEBUT AFTERSHOW - Magic: The Gathering® |  Star Trek</ns2:title>
+   <ns2:content url="https://www.youtube.com/v/aTFW5vo3yac?version=3" type="application/x-shockwave-flash" width="640" height="390" />
+   <ns2:thumbnail url="https://i2.ytimg.com/vi/aTFW5vo3yac/hqdefault.jpg" width="480" height="360" />
+   <ns2:description>Gavin Verhey and Zakeel Gordon enhance the Magic: The Gathering® |  Star Trek debut by diving into the draft archetypes and collectability.</ns2:description>
+   <ns2:community>
+    <ns2:starRating count="148" average="5.00" min="1" max="5" />
+    <ns2:statistics views="13019" />
+   </ns2:community>
+  </ns2:group>
+ </ns0:entry>
+ <ns0:entry>
+  <ns0:id>yt:video:OJHzx9BDLyg</ns0:id>
+  <ns1:videoId>OJHzx9BDLyg</ns1:videoId>
+  <ns1:channelId>UC8ZGymAvfP97qJabgqUkz4A</ns1:channelId>
+  <ns0:title>WeeklyMTG | Secret Lair Drop Reveal plus Banned &amp; Restricted Discussion</ns0:title>
+  <ns0:link rel="alternate" href="https://www.youtube.com/watch?v=OJHzx9BDLyg" />
+  <ns0:author>
+   <ns0:name>Magic: The Gathering</ns0:name>
+   <ns0:uri>https://www.youtube.com/channel/UC8ZGymAvfP97qJabgqUkz4A</ns0:uri>
+  </ns0:author>
+  <ns0:published>2026-10-13T20:00:33+00:00</ns0:published>
+  <ns0:updated>2026-10-18T00:38:31+00:00</ns0:updated>
+  <ns2:group>
+   <ns2:title>WeeklyMTG | Secret Lair Drop Reveal plus Banned &amp; Restricted Discussion</ns2:title>
+   <ns2:content url="https://www.youtube.com/v/OJHzx9BDLyg?version=3" type="application/x-shockwave-flash" width="640" height="390" />
+   <ns2:thumbnail url="https://i4.ytimg.com/vi/OJHzx9BDLyg/hqdefault.jpg" width="480" height="360" />
+   <ns2:description>Blake, Jadine, and Carmen discuss the health of the formats after Monday's Banned and Restriced article. Plus revealing a couple of upcoming Secret Lair drops.</ns2:description>
+   <ns2:community>
+    <ns2:starRating count="151" average="5.00" min="1" max="5" />
+    <ns2:statistics views="19539" />
+   </ns2:community>
+  </ns2:group>
+ </ns0:entry>
+ </ns0:feed>

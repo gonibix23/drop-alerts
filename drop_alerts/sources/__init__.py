@@ -1,6 +1,8 @@
 from .magic_news import MagicNewsSource
 from .secret_lair import SecretLairSource
+from .bluesky import BlueskySource
+from .feeds import FeedSource
+from .official_announcements import ChaosVaultSource, WPNNewsSource, MagicConNewsSource
 
-SOURCE_REGISTRY = {"secret_lair_eu": SecretLairSource, "magic_news": MagicNewsSource}
-
-__all__ = ["MagicNewsSource", "SecretLairSource", "SOURCE_REGISTRY"]
+__all__ = ["MagicNewsSource", "SecretLairSource", "BlueskySource", "FeedSource",
+           "ChaosVaultSource", "WPNNewsSource", "MagicConNewsSource"]

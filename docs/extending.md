@@ -11,15 +11,27 @@ La interfaz `SourceAdapter` define `id` y `async fetch(http) -> FetchResult`. Un
 - `data`: hechos estructurados, incluida la evidencia usada para precio o disponibilidad.
 - `content`: fragmento relevante para interpretación, sin toda la navegación de la página.
 
-`observed_at` registra cuándo se observó y `engine` identifica la clasificación determinista o del modelo. `Item.digest` excluye el instante de observación para que una comprobación repetida no parezca un cambio.
+`observed_at` registra cuándo se observó y `engine` identifica la clasificación determinista o del modelo. `Item.digest` excluye ambos campos, además de `data.image_url`, `data.image_verified` y `data.announcement_url`: son pistas de presentación o identidad cuya incorporación no debe generar un cambio editorial por sí sola.
 
 Implementa el módulo en `drop_alerts/sources/`, regístralo donde se construyen los adaptadores y añade su opción de activación al archivo TOML. Utiliza el transporte compartido para conexiones, límites y consultas condicionales. Nunca conviertas una excepción HTTP, un documento vacío o un selector que dejó de existir en una lista de productos agotados: lanza `ExtractionError` y conserva el último estado correcto.
 
 El punto de registro es `SOURCE_FACTORIES` en `drop_alerts/registry.py`: cada fábrica recibe `(settings, store)` y devuelve el adaptador. La validación de configuración consulta ese registro, sin mantener otra lista de fuentes en el núcleo. Si un catálogo se consulta por ventanas, devuelve `metadata.bootstrap_ids` con todas las identidades descubiertas al establecer la referencia para silenciar también su primera lectura detallada posterior. Los fallos parciales pueden declararse en `metadata.errors`, conservando solo elementos extraídos correctamente.
 
+Al ampliar el descubrimiento de una fuente existente, devuelve `metadata.discovery_inventories` como un diccionario de nombre de canal a lista de IDs. Por ejemplo, `{"sitemap_v1": ["https://magic.wizards.com/en/news/announcements/..."]}`. La primera ingestión correcta registra ese inventario y su marcador en una misma transacción. Con `BOOTSTRAP_MODE=silent`, sus elementos históricos quedan silenciados incluso si la fuente original ya estaba inicializada. Devuelve únicamente inventarios realmente consultados y validados; un fallo no debe cerrar la referencia inicial de un canal. El nombre de canal es estable y solo cambia si introduces otro inventario con semántica distinta.
+
+Un listado reconocido que contiene cero elementos relevantes puede devolver `FetchResult([], not_modified=True)`. Antes debes validar su estructura: una página de acceso, bloqueo o mantenimiento no es un resultado vacío correcto. Esta distinción permite que feeds y fuentes editoriales generales continúen sanos sin inventar anuncios.
+
+`data.announcement_url` puede contener el artículo oficial explícitamente enlazado por la publicación. El núcleo solo admite los dominios y rutas oficiales de `drop_alerts/identities.py` y utiliza esa identidad para evitar repetir el primer aviso del mismo artículo entre fuentes. No es un identificador libre propuesto por la IA ni una promesa de agrupar toda una campaña. Los cambios de contenido y los productos de tienda mantienen sus propios eventos. Si añades imágenes, valida el origen y fija `image_verified=true` solo cuando la URL proceda de metadatos o bloques de la respuesta permitida; no aceptes URLs propuestas por el modelo.
+
 Prioriza feeds anunciados por la fuente, sitemaps, JSON-LD, metadatos y HTML del servidor. Antes de fijar un endpoint o selector, guarda una respuesta real y documenta fecha y procedencia. Descubre enlaces desde la fuente oficial, restringe el origen y limita el número de detalles visitados. No permitas que la IA sugiera nuevas URLs para el monitor.
 
 Añade pruebas con respuestas guardadas: estructura válida, vacía, parcialmente cambiada, JSON malformado, redirección o enlace fuera del origen, límites y fallo de un detalle. Especifica la cobertura: una portada limitada no equivale a un catálogo histórico completo.
+
+## Activación e intervalos
+
+Parte de [config.example.toml](../config.example.toml), que incluye todas las fuentes implementadas y sus reglas. Cada bloque `[sources.<id>]` admite `enabled` e `interval_seconds` entre 30 y 86.400 segundos. Si no declaras intervalo, se aplica `POLL_INTERVAL_SECONDS`. El planificador guarda la próxima comprobación por fuente para respetar esos intervalos tras reinicios; una ejecución `once` fuerza una revisión de las fuentes activadas.
+
+Los apartados `sources` y `rules` de un TOML personalizado sustituyen los valores predeterminados de esos apartados. Si actualizas desde un archivo antiguo con solo dos fuentes, incorpora los nuevos bloques y reglas; actualizar la imagen no los añade a ese archivo. Para activar un medio opcional, cambia su `enabled=false` por `true` y conserva una regla que incluya su ID. Monta el archivo y configura `CONFIG_PATH` para que se lea. La [guía de anuncios](announcement-sources.md) detalla los valores iniciales y las fuentes no implementadas.
 
 ## Reglas
 
@@ -62,4 +74,4 @@ La interfaz `NotificationChannel` define `async send(event)`. Implementa otro ca
 
 ## Base de datos y compatibilidad
 
-Los identificadores se separan por fuente y los datos extensibles se guardan como JSON. Añadir un dominio no necesita una tabla propia. Los cambios de esquema sí requieren una migración versionada y una copia de seguridad previa. No cambies la fórmula de identidad sin un plan para conservar la deduplicación; cambiar IDs puede hacer que elementos conocidos parezcan nuevos.
+Los identificadores se separan por fuente y los datos extensibles se guardan como JSON. Añadir un dominio no necesita una tabla propia. Los cambios de esquema sí requieren una migración versionada y una copia de seguridad previa. La migración actual de 1 a 2 es automática y aditiva: incorpora el registro de anuncios compartidos y conserva estados, colas y entregas. Para actualizar, conserva el volumen y no borres SQLite ni cambies identidades. No cambies la fórmula de identidad sin un plan para conservar la deduplicación; cambiar IDs puede hacer que elementos conocidos parezcan nuevos.

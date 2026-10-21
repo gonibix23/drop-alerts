@@ -3,13 +3,15 @@ from __future__ import annotations
 import asyncio
 import json
 import random
+import re
 import time
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from zoneinfo import ZoneInfo
 
 import httpx
 
-from .models import Event
+from .models import Event, safe_url
 
 
 class DeliveryError(Exception):
@@ -18,32 +20,177 @@ class DeliveryError(Exception):
         self.code, self.retry_after, self.permanent = code, retry_after, permanent
 
 
+SOURCE_LABELS = {
+    "secret_lair_eu": "Secret Lair · Tienda EU",
+    "chaos_vault_eu": "Secret Lair · Chaos Vault EU",
+    "secret_lair_bluesky": "Secret Lair · Bluesky oficial",
+    "magic_news": "Magic · Noticias oficiales",
+    "wpn_news": "WPN · Noticias para tiendas",
+    "magiccon_news": "MagicCon · Noticias oficiales",
+    "weekly_mtg": "WeeklyMTG · YouTube oficial",
+    "magicspoiler": "MagicSpoiler · Medio complementario",
+    "mtggoldfish": "MTGGoldfish · Medio complementario",
+    "mtgdrops": "MTGDrops · Calendario complementario",
+    "scg_news": "Star City Games · Medio complementario",
+}
+EVENT_STYLES = {
+    "announcement.new": ("📣", "Nuevo anuncio", 0x9B6DFF),
+    "publication.new": ("📰", "Nueva publicación", 0x60A5FA),
+    "product.new": ("✨", "Nuevo producto", 0x34D399),
+    "collection.new": ("🗂️", "Nueva colección", 0x2DD4BF),
+    "availability.changed": ("🔔", "Cambio de disponibilidad", 0x34D399),
+    "price.changed": ("💶", "Cambio de precio", 0xFBBF24),
+    "content.changed": ("📝", "Información actualizada", 0x60A5FA),
+    "change.uncertain": ("🔎", "Cambio pendiente de confirmar", 0xF59E0B),
+}
+STATE_LABELS = {"ANNOUNCED": "Anunciado", "UPCOMING": "Próximamente", "AVAILABLE": "Disponible",
+                "UNAVAILABLE": "No disponible", "UNKNOWN": "Sin confirmar"}
+
+
+def _units(value: str) -> int:
+    # A conservative UTF-16 budget also covers Discord clients' string lengths.
+    return len(value.encode("utf-16-le")) // 2
+
+
+def _clip(value: str, limit: int) -> str:
+    if _units(value) <= limit:
+        return value
+    if limit <= 0:
+        return ""
+    result, used = [], 0
+    for character in value:
+        length = _units(character)
+        if used + length > limit - 1:
+            break
+        result.append(character)
+        used += length
+    return "".join(result).rstrip() + "…"
+
+
+def _discord_text(value, limit: int) -> str:
+    # Source text is data: it must not become a ping, masked link or Markdown UI.
+    value = re.sub(r"[\x00-\x1f\x7f\u202a-\u202e\u2066-\u2069]", " ", str(value or ""))
+    value = " ".join(value.split()).replace("@", "@\u200b")
+    value = re.sub(r"([\\`*_~|\[\]()<>#])", r"\\\1", value)
+    return _clip(value, limit)
+
+
+def _http_url(value) -> str | None:
+    if not isinstance(value, str) or len(value) > 2048 or any(character.isspace() or ord(character) < 32 for character in value):
+        return None
+    try:
+        return safe_url(value)
+    except ValueError:
+        return None
+
+
+def _price(item: dict | None) -> str | None:
+    if not item:
+        return None
+    data = item.get("data", {})
+    # Old persisted adapters predate the flag; explicit unverified data is hidden.
+    if data.get("price_verified") is False or not re.fullmatch(r"[A-Z]{3}", str(data.get("currency", ""))):
+        return None
+    try:
+        price = Decimal(str(data.get("price")))
+        if not price.is_finite() or price < 0 or price > Decimal("1000000000") or price.as_tuple().exponent < -8:
+            return None
+    except (InvalidOperation, ValueError):
+        return None
+    return f"{format(price, 'f')} {data['currency']}"
+
+
+def _state(item: dict | None) -> str | None:
+    if not item:
+        return None
+    state, data = item.get("state", "UNKNOWN"), item.get("data", {})
+    editorial = item.get("kind") in ("article", "announcement")
+    if state == "UNKNOWN" or (data.get("availability_verified") is False and not (editorial and state in ("ANNOUNCED", "UPCOMING"))):
+        return None
+    return STATE_LABELS.get(state, _discord_text(state, 100))
+
+
 def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
+    """Render source facts only; semantic analysis never supplies commercial claims."""
     current, previous = event.data["current"], event.data.get("previous")
-    labels = {"product.new": "Nuevo producto", "collection.new": "Nueva colección", "announcement.new": "Nuevo anuncio", "publication.new": "Nueva publicación", "availability.changed": "Cambio de disponibilidad", "price.changed": "Cambio de precio", "content.changed": "Información actualizada", "change.uncertain": "Cambio incierto"}
-    fields = [{"name": "Evento", "value": labels.get(event.event_type, event.event_type)[:1024]}, {"name": "Fuente", "value": event.source[:1024]}]
-    if previous and previous["state"] != current["state"]:
-        fields.append({"name": "Estado", "value": f"{previous['state']} → {current['state']}"[:1024]})
-    elif current["state"] != "UNKNOWN":
-        fields.append({"name": "Estado observado", "value": current["state"][:1024]})
-    if current["data"].get("price") is not None:
-        price = f"{current['data']['price']} {current['data'].get('currency') or ''}".strip()
-        if event.event_type == "price.changed" and previous and previous["data"].get("price") is not None:
-            price = f"{previous['data']['price']} {previous['data'].get('currency') or ''} → {price}"
-        fields.append({"name": "Precio observado", "value": price[:1024]})
-    uncertain = current["state"] == "UNKNOWN" or event.event_type == "change.uncertain"
-    if event.analysis:
-        result = event.analysis["result"]
-        uncertain = uncertain or result.get("needs_review", False)
-        fields.append({"name": "Análisis semántico (sin verificar)", "value": ("Requiere revisión" if result.get("needs_review", False) else "Clasificación orientativa: " + result.get("category", event.analysis["task"]))[:1024]})
-    description = "Cambio detectado en los datos de la fuente."
-    if event.event_type.endswith(".new"):
-        description = "La fuente ha publicado un nuevo elemento."
+    data = current.get("data", {})
+    editorial = current.get("kind") in ("article", "announcement") or event.event_type in ("announcement.new", "publication.new")
+    icon, label, color = EVENT_STYLES.get(event.event_type, ("🔔", event.event_type, 0x60A5FA))
+    state = _state(current)
+    uncertain = event.event_type == "change.uncertain" or (not editorial and state is None)
+    result = event.analysis.get("result", {}) if event.analysis else {}
+    uncertain = uncertain or result.get("needs_review") is True
     if uncertain:
-        description += " Disponibilidad o interpretación incierta; consulta el enlace oficial."
-    local = datetime.fromisoformat(event.occurred_at).astimezone(ZoneInfo(timezone)).strftime("%d/%m/%Y %H:%M %Z")
-    fields.append({"name": "Fecha", "value": local})
-    return {"allowed_mentions": {"parse": [], "users": [], "roles": [], "replied_user": False}, "embeds": [{"title": event.title[:256], "url": event.url[:2048], "description": description, "fields": fields, "timestamp": event.occurred_at, "footer": {"text": "Drop Alerts · " + event.id[:16]}, "color": 0xF1C40F if uncertain else 0x3498DB}]}
+        color = 0xF59E0B
+    elif event.event_type == "availability.changed" and current.get("state") == "UNAVAILABLE":
+        color = 0xF87171
+
+    summary = _discord_text(data.get("summary"), 700)
+    if not summary:
+        summary = {"announcement.new": "La fuente ha publicado un anuncio. Consulta los detalles y las condiciones en el enlace.",
+                   "publication.new": "Nueva publicación de la fuente. Consulta el artículo para conocer los detalles.",
+                   "price.changed": "La fuente muestra un cambio en el precio del producto.",
+                   "availability.changed": "La fuente muestra un cambio en la disponibilidad del producto.",
+                   "content.changed": "La fuente ha actualizado la información de este elemento."}.get(event.event_type, "Nuevo elemento detectado en la fuente.")
+    if uncertain:
+        summary += "\n\n🔎 Información o interpretación incierta; consulta la fuente antes de darla por confirmada."
+
+    fields = [{"name": "📡 Fuente", "value": _discord_text(SOURCE_LABELS.get(event.source, event.source), 200), "inline": True}]
+    region = data.get("region")
+    if region:
+        regions = {"EU": "Europa", "US": "Estados Unidos", "GLOBAL": "Internacional", "global": "Internacional"}
+        fields.append({"name": "🌍 Región", "value": _discord_text(regions.get(str(region), region), 100), "inline": True})
+    if state:
+        old_state = _state(previous)
+        value = f"{old_state} → {state}" if old_state and previous.get("state") != current.get("state") else state
+        fields.append({"name": "📍 Estado" if editorial else "📦 Disponibilidad", "value": value, "inline": True})
+    price = _price(current)
+    if price:
+        old_price = _price(previous)
+        if event.event_type == "price.changed" and old_price:
+            price = f"{old_price} → {price}"
+        fields.append({"name": "💶 Precio observado", "value": price, "inline": True})
+    try:
+        instant = datetime.fromisoformat(event.occurred_at)
+        if instant.tzinfo is None:
+            raise ValueError("Fecha sin zona horaria")
+        local = instant.astimezone(ZoneInfo(timezone)).strftime("%d/%m/%Y · %H:%M %Z")
+        fields.append({"name": "🕒 Detectado", "value": local, "inline": True})
+    except ValueError:
+        instant = None
+    if event.analysis:
+        # Deliberately omit free-form model summaries, prices, URLs and categories.
+        fields.append({"name": "🧠 Análisis semántico · sin verificar", "value": "Requiere revisión" if result.get("needs_review") else "Análisis orientativo disponible; los datos mostrados proceden de la fuente.", "inline": False})
+    url = _http_url(event.url)
+    if url:
+        # Only the trusted adapter's event URL becomes a clickable Markdown link.
+        link_url = url.replace("\\", "%5C").replace("(", "%28").replace(")", "%29").replace("<", "%3C").replace(">", "%3E")
+        link = f"[Abrir {'anuncio' if editorial else 'fuente'} ↗](<{link_url}>)"
+        fields.append({"name": "🔗 Detalles", "value": link if _units(link) <= 1024 else "Pulsa el título para consultar la fuente.", "inline": False})
+
+    embed = {"author": {"name": _discord_text(f"{icon} {label}", 256)}, "title": _discord_text(event.title, 256) or "Nueva alerta",
+             "description": _clip(summary, 4096), "color": color,
+             "footer": {"text": "Drop Alerts · " + _discord_text(event.id, 12)}}
+    if url:
+        embed["url"] = url
+    if instant:
+        embed["timestamp"] = instant.isoformat()
+    image_url = _http_url(data.get("image_url")) if data.get("image_verified") is True else None
+    if image_url:
+        embed["image"] = {"url": image_url}
+    # Enforce the total embed budget after individual limits, including the author.
+    remaining = 6000 - sum(_units(value) for value in (embed["author"]["name"], embed["title"], embed["description"], embed["footer"]["text"]))
+    embed["fields"] = []
+    for field in fields[:25]:
+        name = _clip(field["name"], 256)
+        limit = min(1024, remaining - _units(name))
+        if limit < 1:
+            break
+        value = _clip(field["value"], limit)
+        if value:
+            embed["fields"].append({**field, "name": name, "value": value})
+            remaining -= _units(name) + _units(value)
+    return {"allowed_mentions": {"parse": [], "users": [], "roles": [], "replied_user": False}, "embeds": [embed]}
 
 
 class DiscordChannel:

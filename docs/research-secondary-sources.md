@@ -1,6 +1,6 @@
 # Fuentes complementarias para Secret Lair y lanzamientos especiales
 
-Investigación realizada el **21 de octubre de 2026**. Este informe describe fuentes candidatas; **no activa adaptadores nuevos**. Las respuestas HTTP se consultaron con TLS verificado, sin iniciar sesión, enviar mensajes ni suscribirse. Las capturas y los resultados de diagnóstico están en `work/research/secondary/`, excluidos de Git.
+Investigación realizada el **21 de octubre de 2026**. Este informe conserva la revisión inicial de fuentes candidatas. **Estado actual:** MagicSpoiler, MTGGoldfish, MTGDrops y Star City Games tienen adaptadores opcionales, desactivados por defecto; las siete fuentes oficiales y su configuración se detallan en [fuentes implementadas](announcement-sources.md). Las respuestas HTTP de esta investigación se consultaron con TLS verificado, sin iniciar sesión, enviar mensajes ni suscribirse. Las capturas y los resultados de diagnóstico están en `work/research/secondary/`, excluidos de Git.
 
 Una fuente complementaria sirve para descubrir un anuncio y localizar su procedencia. Sus precios, calendario o etiquetas de disponibilidad no deben sustituir la información oficial del producto EU.
 
