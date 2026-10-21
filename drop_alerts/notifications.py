@@ -5,9 +5,9 @@ import json
 import random
 import re
 import time
-from datetime import datetime
+from datetime import date, datetime, timezone as datetime_timezone
 from decimal import Decimal, InvalidOperation
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
 
@@ -40,6 +40,7 @@ EVENT_STYLES = {
     "collection.new": ("🗂️", "Nueva colección", 0x2DD4BF),
     "availability.changed": ("🔔", "Cambio de disponibilidad", 0x34D399),
     "price.changed": ("💶", "Cambio de precio", 0xFBBF24),
+    "release_date.changed": ("🗓️", "Cambio de fecha", 0xFBBF24),
     "content.changed": ("📝", "Información actualizada", 0x60A5FA),
     "change.uncertain": ("🔎", "Cambio pendiente de confirmar", 0xF59E0B),
 }
@@ -110,6 +111,79 @@ def _state(item: dict | None) -> str | None:
     return STATE_LABELS.get(state, _discord_text(state, 100))
 
 
+def _release_schedule_text(schedule: dict, target_timezone: str) -> str:
+    """Display only the validated schedule supplied by the enrichment boundary."""
+    certainty = schedule.get("certainty", "unknown")
+    if certainty == "conflicting":
+        return "Fechas contradictorias · consultar fuente"
+    if certainty not in ("explicit", "estimated") or not schedule.get("date"):
+        return "Sin fecha confirmada"
+    try:
+        day = date.fromisoformat(schedule["date"])
+    except (ValueError, TypeError):
+        return "Sin fecha confirmada"
+    value = day.strftime("%d/%m/%Y")
+    hour, origin = schedule.get("time"), schedule.get("timezone")
+    if hour:
+        try:
+            if not isinstance(hour, str) or not re.fullmatch(r"\d{2}:\d{2}", hour):
+                raise ValueError("Hora inválida")
+            local = datetime.fromisoformat(f"{day.isoformat()}T{hour}")
+            if origin:
+                zone = ZoneInfo(origin)
+                aware = local.replace(tzinfo=zone)
+                # Skip nonexistent or ambiguous clock readings around DST changes.
+                roundtrip = aware.astimezone(datetime_timezone.utc).astimezone(zone)
+                ambiguous = aware.utcoffset() != local.replace(tzinfo=zone, fold=1).utcoffset()
+                if roundtrip.replace(tzinfo=None) != local or ambiguous:
+                    value += " · hora pendiente de confirmar"
+                else:
+                    converted = aware.astimezone(ZoneInfo(target_timezone))
+                    place = "hora de Madrid" if target_timezone == "Europe/Madrid" else target_timezone
+                    value = converted.strftime("%d/%m/%Y · %H:%M %Z") + " · " + place
+            else:
+                value += f" · {hour} (zona horaria no especificada)"
+        except (ValueError, TypeError, ZoneInfoNotFoundError):
+            value += " · hora pendiente de confirmar"
+    else:
+        value += " · hora sin confirmar"
+    if schedule.get("end_date"):
+        try:
+            end = date.fromisoformat(schedule["end_date"])
+            if end >= day:
+                # A closing date has no implied time or timezone conversion.
+                value += "\nHasta " + end.strftime("%d/%m/%Y")
+                if origin:
+                    place = {"America/Los_Angeles": "del Pacífico", "Europe/Madrid": "de Madrid", "UTC": "en UTC"}.get(origin, "en " + origin)
+                    value += " · fecha " + place
+                value += " · hora de cierre sin confirmar"
+        except (ValueError, TypeError):
+            pass
+    if certainty == "estimated" or schedule.get("year_inferred") or schedule.get("engine") == "model":
+        value = "Orientativa · " + value
+        if schedule.get("year_inferred"):
+            value += "\nAño inferido a partir del anuncio"
+    return value
+
+
+def _release_schedule_field(current: dict, previous: dict | None, analysis: dict | None, timezone: str, editorial: bool) -> dict | None:
+    from .schedule_enrichment import effective_release_schedule
+
+    schedule = effective_release_schedule(current, analysis)
+    if not editorial and not schedule.get("date") and "release_schedule" not in current.get("data", {}):
+        return None
+    names = {"sale": "🗓️ Venta prevista", "preorder": "🗓️ Preventa prevista", "release": "🗓️ Lanzamiento previsto"}
+    value = _release_schedule_text(schedule, timezone)
+    if previous and schedule.get("date") and schedule.get("certainty") in ("explicit", "estimated"):
+        old = effective_release_schedule(previous)
+        keys = ("date", "time", "timezone", "end_date")
+        if (old.get("date") and old.get("certainty") in ("explicit", "estimated")
+                and any(old.get(key) != schedule.get(key) for key in keys)):
+            value = _release_schedule_text(old, timezone) + "\n→ " + value
+    return {"name": names.get(schedule.get("date_kind"), "🗓️ Lanzamiento previsto"),
+            "value": _clip(value, 1024), "inline": False}
+
+
 def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
     """Render source facts only; semantic analysis never supplies commercial claims."""
     current, previous = event.data["current"], event.data.get("previous")
@@ -130,6 +204,7 @@ def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
         summary = {"announcement.new": "La fuente ha publicado un anuncio. Consulta los detalles y las condiciones en el enlace.",
                    "publication.new": "Nueva publicación de la fuente. Consulta el artículo para conocer los detalles.",
                    "price.changed": "La fuente muestra un cambio en el precio del producto.",
+                   "release_date.changed": "La fuente ha actualizado la fecha prevista. Consulta los detalles del anuncio.",
                    "availability.changed": "La fuente muestra un cambio en la disponibilidad del producto.",
                    "content.changed": "La fuente ha actualizado la información de este elemento."}.get(event.event_type, "Nuevo elemento detectado en la fuente.")
     if uncertain:
@@ -150,6 +225,9 @@ def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
         if event.event_type == "price.changed" and old_price:
             price = f"{old_price} → {price}"
         fields.append({"name": "💶 Precio observado", "value": price, "inline": True})
+    release = _release_schedule_field(current, previous, event.analysis, timezone, editorial)
+    if release:
+        fields.append(release)
     try:
         instant = datetime.fromisoformat(event.occurred_at)
         if instant.tzinfo is None:

@@ -2,6 +2,16 @@
 
 Comprobado el 21 de octubre de 2026. El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts).
 
+## Actualización 1.2: fecha prevista del drop
+
+- `python -m pytest -q --basetemp work/pytest-release-1-2-final-check`: **428 pruebas aprobadas**, Python 3.14 en Windows. Incluyen extracción temporal en inglés/español, ventanas, zonas horarias, negaciones, encabezados de envío/legalidad, fecha orientativa por selección semántica y reintentos sin duplicados.
+- Consulta HTTPS real con TLS verificado a dos anuncios de Magic, sin IA, webhook ni base de producción: Countdown Kit se extrajo como **02/11/2026**, y la nueva venta de The Zeta Set como **09/12/2026**. Ambos quedaron sin hora porque los textos examinados no la proporcionan. Se conservaron como anuncios, sin convertirlos en stock disponible.
+- La reproducción completa de un artículo guardado pasa por extracción, persistencia y tarjeta Discord, utilizando la fecha del lanzamiento y descartando la legalidad de cartas de abril de 2027.
+- Se comprobó el enriquecimiento de elementos antiguos sin nuevas revisiones ni entregas, la lectura de eventos legados y el vencimiento de la ayuda opcional de IA en un máximo de 60 segundos. No se ejecutó una inferencia real ni se envió un mensaje a Discord.
+- La nueva información usa los JSON existentes: se conserva el esquema SQLite 2 y el volumen. Los resultados de Docker y las pruebas Linux de cada commit se consultan en GitHub Actions.
+
+Véase [cómo se detectan y presentan las fechas](release-dates.md). Las verificaciones siguientes son históricas.
+
 ## Actualización 1.1: anuncios y Discord
 
 - `python -m pytest -q --basetemp work/pytest-release-1-1`: **267 pruebas aprobadas**, Python 3.14 en Windows. Incluyen las siete fuentes, RSS/Atom secundarios, inventarios silenciosos en bases existentes, migración 1→2, deduplicación entre fuentes, planificación, límites HTTP compartidos y presentación de Discord. No requieren servicios externos.

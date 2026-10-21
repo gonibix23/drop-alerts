@@ -37,6 +37,8 @@ Las notificaciones usan tarjetas con color e icono según el evento, título enl
 
 Puedes abrir la [vista previa HTML](docs/discord-preview.html) en tu navegador o consultar el [JSON de ejemplo](docs/examples/discord-announcement.json). Ambos usan datos ficticios y no envían mensajes.
 
+El servicio intenta obtener la **fecha prevista de venta, preventa o lanzamiento** a partir del anuncio y mostrarla separada de cuándo fue detectado. Convierte la hora a la zona configurada —Madrid por defecto— solo cuando la fuente especifica una zona horaria, marca las fechas orientativas y avisa de los cambios de fecha. Si no hay datos suficientes, muestra «Sin fecha confirmada». Consulta [cómo se extraen y validan las fechas](docs/release-dates.md).
+
 La deduplicación entre fuentes reconoce publicaciones que enlazan el mismo artículo oficial. No fusiona automáticamente campañas por títulos parecidos: dos anuncios diferentes, una revelación y un producto de tienda pueden generar eventos distintos. La [guía de fuentes](docs/announcement-sources.md) explica esa cobertura y sus límites.
 
 ## Modelo remoto

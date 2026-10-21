@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .models import Event, FetchResult, Item, canonical_json, fingerprint, utcnow
 from .identities import announcement_url
+from .schedule_enrichment import enrich_item, should_analyze_schedule, source_text
 
 
 class Store:
@@ -142,9 +143,14 @@ class Store:
                     if isinstance(item_id, str):
                         self.db.execute("INSERT OR IGNORE INTO bootstrap_items VALUES(?,?)", (source, item_id))
             for current in result.items:
+                enrich_item(current)
                 previous, revision = self.item(source, current.id)
                 historical = previous is None and self.db.execute("SELECT 1 FROM bootstrap_items WHERE source=? AND id=?", (source, current.id)).fetchone() is not None
                 if previous and current.digest == previous.digest:
+                    # Enrich an existing snapshot without inventing a revision,
+                    # event or duplicate delivery solely because the parser is new.
+                    if previous.data.get("release_schedule") != current.data.get("release_schedule") or previous.data.get("release_schedule_version") != current.data.get("release_schedule_version"):
+                        self.db.execute("UPDATE items SET payload=? WHERE source=? AND id=?", (canonical_json(asdict(current)), source, current.id))
                     continue
                 revision += 1
                 payload = canonical_json(asdict(current))
@@ -165,14 +171,23 @@ class Store:
                         status = "waiting_analysis" if decision.require_analysis else "pending"
                         self.db.execute("INSERT OR IGNORE INTO outbox(event_id,status) VALUES(?,?)", (event.id, status))
                         task = "change" if previous and event.event_type in ("content.changed", "change.uncertain") else "classification"
+                        if should_analyze_schedule(current):
+                            task = "release_schedule"
                         if settings.llm_enabled and (current.kind in ("article", "announcement", "unknown") or task == "change" or decision.require_analysis):
                             content = current.title + "\n" + current.content
+                            if task == "release_schedule":
+                                content = source_text(asdict(current))
                             if task == "change":
                                 content = "ANTERIOR:\n" + (previous.title + "\n" + previous.content)[:settings.llm_max_input_chars // 2] + "\nACTUAL:\n" + content[:settings.llm_max_input_chars // 2]
                             content = content[:settings.llm_max_input_chars]
                             job_id = fingerprint({"source": source, "item": current.id, "revision": revision, "digest": current.digest, "task": task})
                             self.db.execute("INSERT OR IGNORE INTO analysis_jobs(id,source,item_id,digest,task,content,status,created) VALUES(?,?,?,?,?,?,?,?)", (job_id, source, current.id, current.digest, task, content, "pending", time.time()))
                             self.db.execute("INSERT OR REPLACE INTO event_jobs VALUES(?,?)", (event.id, job_id))
+                            if task == "release_schedule" and not decision.require_analysis:
+                                # Optional semantic help gets a bounded head start;
+                                # an offline/busy model cannot hold delivery forever.
+                                grace = min(60, settings.llm_timeout_seconds * (1 + settings.llm_max_retries) + 5)
+                                self.db.execute("UPDATE outbox SET next_attempt=? WHERE event_id=?", (time.time() + grace, event.id))
                         elif decision.require_analysis:
                             self.db.execute("UPDATE outbox SET status='dead',last_error='analysis_disabled' WHERE event_id=?", (event.id,))
             self.db.execute("UPDATE sources SET initialized=1,last_success=?,last_error=NULL,failures=0 WHERE id=?", (utcnow(), source))
@@ -221,6 +236,10 @@ class Store:
                     self.db.execute("UPDATE outbox SET status='pending' WHERE event_id=? AND status='waiting_analysis'", (row["id"],))
                 elif status == "failed":
                     self.db.execute("UPDATE outbox SET status='dead',last_error='analysis_failed' WHERE event_id=? AND status='waiting_analysis'", (row["id"],))
+                if job["task"] == "release_schedule":
+                    # Do not reset Discord backoff, reopen sent messages or turn
+                    # failed optional analysis into an extra notification.
+                    self.db.execute("UPDATE outbox SET next_attempt=0 WHERE event_id=? AND status='pending' AND attempts=0", (row["id"],))
 
     def due_notifications(self, limit: int):
         rows = self.db.execute("SELECT e.payload,o.attempts FROM outbox o JOIN events e ON e.id=o.event_id WHERE o.status='pending' AND o.next_attempt<=? ORDER BY e.created LIMIT ?", (time.time(), limit)).fetchall()

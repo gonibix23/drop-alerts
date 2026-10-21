@@ -39,7 +39,7 @@ class SourceHTTP:
     async def _get(self, url: str, redirects: int = 0) -> str:
         url = safe_url(url)
         cached = self.store.get_http_cache(url) if self.store else self._cache.get(url)
-        headers = {"User-Agent": "drop-alerts/1.1 (self-hosted source monitoring)"}
+        headers = {"User-Agent": "drop-alerts/1.2 (self-hosted source monitoring)"}
         if cached:
             if cached.get("etag"):
                 headers["If-None-Match"] = cached["etag"]

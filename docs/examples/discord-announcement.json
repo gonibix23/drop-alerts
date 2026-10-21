@@ -11,7 +11,7 @@
         "name": "📣 Nuevo anuncio"
       },
       "title": "EJEMPLO FICTICIO · Secret Lair: próxima colaboración",
-      "description": "Este es un aviso de muestra para ver el diseño. Un anuncio real mostraría aquí el resumen extraído de su fuente.",
+      "description": "Ejemplo ficticio: la venta se anuncia para el 2 de noviembre de 2026 a las 09:00 del Pacífico. La tarjeta muestra la hora de Madrid.",
       "color": 10186239,
       "footer": {
         "text": "Drop Alerts · ejemplo-no-…"
@@ -33,6 +33,11 @@
           "name": "📍 Estado",
           "value": "Anunciado",
           "inline": true
+        },
+        {
+          "name": "🗓️ Venta prevista",
+          "value": "02/11/2026 · 18:00 CET · hora de Madrid",
+          "inline": false
         },
         {
           "name": "🕒 Detectado",

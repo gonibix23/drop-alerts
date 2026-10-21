@@ -50,7 +50,7 @@ class Item:
         value = {k: v for k, v in asdict(self).items() if k not in ("observed_at", "engine")}
         # Presentation/identity hints must not turn an adapter upgrade into an alert.
         value["data"] = {k: v for k, v in value["data"].items()
-                         if k not in ("image_url", "image_verified", "announcement_url")}
+                         if k not in ("image_url", "image_verified", "announcement_url", "release_schedule", "release_schedule_version")}
         return fingerprint(value)
 
 

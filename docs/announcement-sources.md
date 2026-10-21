@@ -47,6 +47,8 @@ Discord muestra una tarjeta con icono y color por evento, título enlazado, extr
 
 WeeklyMTG aporta texto del feed y miniatura; no transcribe vídeo ni interpreta imágenes. Del mismo modo, una imagen en Bluesky no aporta automáticamente sus fechas o nombres al analizador de texto.
 
+Las fuentes de anuncios también alimentan la [extracción de fechas previstas](release-dates.md). Se distinguen venta, preventa y lanzamiento de publicación, envío, legalidad y eventos. Discord separa esa fecha de **Detectado**, muestra las estimaciones como orientativas y puede presentar **Cambio de fecha** cuando el anuncio se modifica. Las vistas previas de eventos antiguos calculan la fecha desde el texto guardado, sin visitar otra vez la página.
+
 El formato respeta los [límites oficiales de embeds y menciones de Discord](https://docs.discord.com/developers/resources/message). La API de autor utilizada por Bluesky aparece en su [referencia oficial de endpoints](https://endpoints.bsky.app/).
 
 ## Actualizar un stack existente

@@ -75,7 +75,7 @@ def heartbeat(settings):
     path = Path(settings.heartbeat_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps({"timestamp": time.time(), "version": "1.1.0"}), encoding="utf-8")
+    temporary.write_text(json.dumps({"timestamp": time.time(), "version": "1.2.0"}), encoding="utf-8")
     temporary.replace(path)
 
 
