@@ -1,0 +1,33 @@
+{
+  "note": "Respuestas simuladas para pruebas; no son observaciones de la fuente ni del servidor real.",
+  "classification": {
+    "category": "announcement",
+    "is_product": false,
+    "title": "Secret Lair: A New Drop",
+    "entities": ["Secret Lair"],
+    "event_type": "announced",
+    "price": null,
+    "currency": null,
+    "availability": "UPCOMING",
+    "evidence": ["Coming soon on November 1"],
+    "confidence": 0.8,
+    "needs_review": false,
+    "summary": "Anuncio de una próxima colección.",
+    "reason": "El texto anuncia una fecha futura."
+  },
+  "uncertain": {
+    "category": "unknown",
+    "is_product": null,
+    "title": "Contenido sin clasificar",
+    "entities": [],
+    "event_type": "change.uncertain",
+    "price": null,
+    "currency": null,
+    "availability": "UNKNOWN",
+    "evidence": [],
+    "confidence": 0.1,
+    "needs_review": true,
+    "summary": "La información no permite clasificar el contenido.",
+    "reason": "Faltan indicadores verificables."
+  }
+}

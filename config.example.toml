@@ -1,0 +1,27 @@
+# Copiar y montar en /app/config.toml para personalizar las fuentes y reglas.
+# Los adaptadores y sus URLs oficiales se registran en el código.
+[sources.secret_lair_eu]
+enabled = true
+
+[sources.magic_news]
+enabled = true
+
+# Los filtros de una regla se combinan con AND; valores dentro de un filtro, OR.
+# Una lista vacía no restringe ese campo. Al menos una regla debe coincidir.
+[[rules]]
+id = "secret-lair-store"
+enabled = true
+sources = ["secret_lair_eu"]
+kinds = []
+event_types = []
+keywords = []
+require_analysis = false
+
+[[rules]]
+id = "secret-lair-news"
+enabled = true
+sources = ["magic_news"]
+kinds = []
+event_types = []
+keywords = ["secret lair"]
+require_analysis = false

@@ -1,0 +1,55 @@
+services:
+  drop-alerts:
+    image: ${DROP_ALERTS_IMAGE:-drop-alerts:1.0.0}
+    restart: unless-stopped
+    init: true
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    volumes:
+      - drop_alerts_data:/data
+    environment:
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL:-}
+      DISCORD_WEBHOOK_URL_FILE: ${DISCORD_WEBHOOK_URL_FILE:-}
+      POLL_INTERVAL_SECONDS: ${POLL_INTERVAL_SECONDS:-300}
+      TIMEZONE: ${TIMEZONE:-Europe/Madrid}
+      BOOTSTRAP_MODE: ${BOOTSTRAP_MODE:-silent}
+      DATABASE_PATH: ${DATABASE_PATH:-/data/drop-alerts.db}
+      HEARTBEAT_PATH: ${HEARTBEAT_PATH:-/data/heartbeat.json}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      CONFIG_PATH: ${CONFIG_PATH:-/app/config.toml}
+      HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-20}
+      HTTP_MAX_RETRIES: ${HTTP_MAX_RETRIES:-1}
+      SOURCE_MAX_BYTES: ${SOURCE_MAX_BYTES:-2000000}
+      SOURCE_MAX_ITEMS: ${SOURCE_MAX_ITEMS:-100}
+      LLM_ENABLED: ${LLM_ENABLED:-true}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://llama.gonibix23.com/v1}
+      LLM_MODEL: ${LLM_MODEL:-qwen3:8b-q4_k_m}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_API_KEY_FILE: ${LLM_API_KEY_FILE:-}
+      LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-45}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-1}
+      LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.1}
+      LLM_MAX_INPUT_CHARS: ${LLM_MAX_INPUT_CHARS:-12000}
+      LLM_CACHE_ENABLED: ${LLM_CACHE_ENABLED:-true}
+      LLM_MAX_OUTPUT_TOKENS: ${LLM_MAX_OUTPUT_TOKENS:-1200}
+      MAX_PENDING_ANALYSES: ${MAX_PENDING_ANALYSES:-100}
+      ANALYSES_PER_TICK: ${ANALYSES_PER_TICK:-4}
+      ANALYSIS_MAX_ATTEMPTS: ${ANALYSIS_MAX_ATTEMPTS:-3}
+      NOTIFICATION_MAX_ATTEMPTS: ${NOTIFICATION_MAX_ATTEMPTS:-12}
+      NOTIFICATION_BATCH_SIZE: ${NOTIFICATION_BATCH_SIZE:-10}
+      RETENTION_DAYS: ${RETENTION_DAYS:-90}
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+    stop_grace_period: 30s
+
+volumes:
+  drop_alerts_data:
