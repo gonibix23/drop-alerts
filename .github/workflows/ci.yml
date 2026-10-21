@@ -26,9 +26,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - run: docker build -t drop-alerts:ci .
+      - name: Build the same Compose configuration used by Portainer
+        run: docker compose --project-name drop-alerts-ci build
       - name: Verify non-root runtime, health and persistent storage
-        run: timeout 90s bash scripts/container-smoke.sh drop-alerts:ci
+        run: |
+          image="$(docker compose --project-name drop-alerts-ci config --images)"
+          timeout 90s bash scripts/container-smoke.sh "$image"
   publish:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: image

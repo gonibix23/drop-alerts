@@ -2,11 +2,11 @@
 
 ## El stack falla con pull access denied
 
-Comprueba la imagen efectiva en el editor y las variables del stack. El valor predeterminado actual es `ghcr.io/gonibix23/drop-alerts:main`. Si aparece `drop-alerts:1.0.0`, actualiza el Compose y elimina o cambia la variable `DROP_ALERTS_IMAGE` antigua: una variable definida en Portainer prevalece sobre el valor predeterminado del archivo.
+El Compose predeterminado construye la aplicación con `build:` desde el repositorio. Actualiza `docker-compose.yml` y despliega desde **Repository** con la ruta `docker-compose.yml`. Si aún aparece `image: drop-alerts:1.0.0` o una referencia GHCR, estás usando la configuración anterior o la alternativa de descarga. Elimina la variable antigua `DROP_ALERTS_IMAGE` y comprueba el contenido efectivo del stack. El modo Web editor por sí solo no proporciona el Dockerfile ni el código necesarios para construir.
 
-La imagen GHCR es privada. Configura **Registries → Add registry → Custom registry** con URL `ghcr.io`, usuario `gonibix23` y un token de GitHub **classic** con `read:packages`. Después permite el acceso al entorno/usuario y selecciona ese registro para el stack según tu versión de Portainer. No uses la contraseña de GitHub. Autenticar el repositorio Git no autentica la descarga de la imagen. Instrucciones y enlaces oficiales en `deployment.md`.
+La construcción desde Git utiliza el acceso al repositorio privado configurado en Portainer, igual que otros proyectos privados con `build:`. No requiere autenticar la imagen de aplicación en un registro. Si falla la descarga de la imagen base o de dependencias, revisa la conectividad del Docker Engine y el error concreto de la construcción.
 
-Comprueba también que el trabajo de publicación de GitHub Actions haya terminado correctamente y que exista la etiqueta solicitada. Un error de permisos o una publicación pendiente no se arregla cambiando a una etiqueta inexistente. Si has elegido una construcción local, la imagen debe existir en el mismo Docker Engine que usa Portainer y debes desactivar la descarga forzada de esa imagen local.
+Solo para la alternativa GHCR: el paquete es privado y necesita un registro personalizado `ghcr.io`, usuario `gonibix23` y un token de GitHub **classic** con `read:packages`. Selecciona ese registro para el stack y comprueba que la publicación y la etiqueta existan. El acceso Git y el acceso al registro son independientes. Instrucciones y enlaces oficiales en `deployment.md`.
 
 ## No llegan mensajes
 
