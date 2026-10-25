@@ -32,7 +32,43 @@ SOURCE_LABELS = {
     "mtggoldfish": "MTGGoldfish · Medio complementario",
     "mtgdrops": "MTGDrops · Calendario complementario",
     "scg_news": "Star City Games · Medio complementario",
+    "one_piece_news": "One Piece · Noticias oficiales",
+    "one_piece_products": "One Piece · Catálogo oficial",
+    "one_piece_topics": "One Piece · Anuncios oficiales",
+    "one_piece_jp_news": "One Piece · Noticias oficiales de Japón",
+    "one_piece_jp_products": "One Piece · Catálogo oficial de Japón",
+    "pokemon_news": "Pokémon · Noticias oficiales",
+    "pokemon_news_es": "Pokémon · Noticias oficiales en español",
+    "pokemon_products": "Pokémon TCG · Catálogo oficial",
+    "pokemon_tcg_products": "Pokémon TCG · Catálogo oficial",
+    "pokemon_jp_news": "Pokémon · Noticias oficiales de Japón",
+    "pokemon_products_es": "Pokémon TCG · Galería oficial en español",
+    "pokemon_tcg_news_es": "Pokémon TCG · Noticias oficiales en español",
+    "pokemon_press_es": "Pokémon · Prensa oficial en español",
+    "pokemon_products_us": "Pokémon TCG · Galería oficial de Estados Unidos",
+    "pokemon_news_jp": "Pokémon Card Game · Noticias oficiales de Japón",
+    "local_tcg_events": "dondejugarTCG · Alcalá y Torrejón",
+    "local_tcg_events_madrid": "dondejugarTCG · Madrid y alrededores",
+    "mundicomics_events": "Mundicomics · Eventos",
+    "gladius_events": "Gladius · Eventos",
+    "nextdice_events": "Next Dice · Eventos",
+    "arte9_events": "Arte 9 · Eventos",
+    "ludoteca_events": "Ludoteca Maldita · Eventos",
+    "jupiter_guadalajara_events": "Júpiter Guadalajara · Eventos",
 }
+TCG_LABELS = {"magic": "Magic: The Gathering", "one_piece": "One Piece Card Game", "pokemon": "Pokémon TCG"}
+TCG_COLORS = {"one_piece": 0xE75B56, "pokemon": 0xF2C94C}
+REGION_LABELS = {"EU": "Europa", "ES": "España", "US": "Estados Unidos", "NA": "Norteamérica",
+                 "UK": "Reino Unido", "GB": "Reino Unido", "JP": "Japón", "GLOBAL": "Internacional",
+                 "global": "Internacional", "WESTERN": "Occidente · incluye Europa",
+                 "OC": "Oceanía", "LATAM": "Latinoamérica", "ME": "Oriente Medio"}
+LANGUAGE_LABELS = {"en": "Inglés", "es": "Español", "ja": "Japonés", "jp": "Japonés",
+                   "fr": "Francés", "de": "Alemán", "it": "Italiano", "pt": "Portugués"}
+CHANNEL_LABELS = {"online": "Venta online", "retail": "Tiendas", "event": "Evento / presencial",
+                  "catalog": "Catálogo", "catalogue": "Catálogo", "news": "Noticias y anuncios",
+                  "editorial": "Noticias y anuncios", "social": "Red social", "video": "Vídeo",
+                  "promotion": "Promoción", "promo": "Promoción", "announcement": "Anuncio",
+                  "local_event": "Evento local"}
 EVENT_STYLES = {
     "announcement.new": ("📣", "Nuevo anuncio", 0x9B6DFF),
     "publication.new": ("📰", "Nueva publicación", 0x60A5FA),
@@ -43,9 +79,16 @@ EVENT_STYLES = {
     "release_date.changed": ("🗓️", "Cambio de fecha", 0xFBBF24),
     "content.changed": ("📝", "Información actualizada", 0x60A5FA),
     "change.uncertain": ("🔎", "Cambio pendiente de confirmar", 0xF59E0B),
+    "event.new": ("📅", "Nuevo evento", 0x60A5FA),
+    "event.schedule_changed": ("🗓️", "Cambio de horario", 0xFBBF24),
+    "event.cancelled": ("🚫", "Evento cancelado", 0xF87171),
+    "event.updated": ("📝", "Evento actualizado", 0x60A5FA),
 }
 STATE_LABELS = {"ANNOUNCED": "Anunciado", "UPCOMING": "Próximamente", "AVAILABLE": "Disponible",
-                "UNAVAILABLE": "No disponible", "UNKNOWN": "Sin confirmar"}
+                "UNAVAILABLE": "No disponible", "UNKNOWN": "Sin confirmar", "SCHEDULED": "Programado",
+                "CANCELLED": "Cancelado", "POSTPONED": "Aplazado", "RESCHEDULED": "Reprogramado", "ONGOING": "En curso",
+                "COMPLETED": "Finalizado", "REGISTRATION_OPEN": "Inscripción abierta",
+                "REGISTRATION_CLOSED": "Inscripción cerrada"}
 
 
 def _units(value: str) -> int:
@@ -106,7 +149,8 @@ def _state(item: dict | None) -> str | None:
         return None
     state, data = item.get("state", "UNKNOWN"), item.get("data", {})
     editorial = item.get("kind") in ("article", "announcement")
-    if state == "UNKNOWN" or (data.get("availability_verified") is False and not (editorial and state in ("ANNOUNCED", "UPCOMING"))):
+    event = item.get("kind") == "event"
+    if state == "UNKNOWN" or (data.get("availability_verified") is False and not event and not (editorial and state in ("ANNOUNCED", "UPCOMING"))):
         return None
     return STATE_LABELS.get(state, _discord_text(state, 100))
 
@@ -184,12 +228,80 @@ def _release_schedule_field(current: dict, previous: dict | None, analysis: dict
             "value": _clip(value, 1024), "inline": False}
 
 
+def _event_datetime(value, origin: str | None, target: str) -> tuple[str | None, datetime | None]:
+    if not isinstance(value, str):
+        return None, None
+    try:
+        instant = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if instant.tzinfo is None:
+            if not origin:
+                return instant.strftime("%d/%m/%Y · %H:%M") + " · zona horaria sin confirmar", None
+            local, zone = instant, ZoneInfo(origin)
+            instant = local.replace(tzinfo=zone)
+            ambiguous = instant.utcoffset() != local.replace(tzinfo=zone, fold=1).utcoffset()
+            if ambiguous or instant.astimezone(datetime_timezone.utc).astimezone(zone).replace(tzinfo=None) != local:
+                return local.strftime("%d/%m/%Y") + " · hora pendiente de confirmar", None
+        converted = instant.astimezone(ZoneInfo(target))
+        place = "hora de Madrid" if target == "Europe/Madrid" else target
+        return converted.strftime("%d/%m/%Y · %H:%M %Z") + " · " + place, instant
+    except (ValueError, TypeError, OverflowError, ZoneInfoNotFoundError):
+        return None, None
+
+
+def _event_fields(current: dict, timezone: str) -> list[dict]:
+    from .event_schedule import validated_event_schedule
+
+    data = current.get("data", {})
+    schedule = validated_event_schedule(current)
+    fields = []
+    value = None
+    if schedule:
+        value, start = _event_datetime(schedule.get("start_at"), schedule.get("timezone"), timezone)
+        end_text, end = _event_datetime(schedule.get("end_at"), schedule.get("timezone"), timezone)
+        if value and end_text and start and end and end >= start:
+            value += "\nHasta " + end_text
+        if not value and schedule.get("start_date"):
+            try:
+                value = date.fromisoformat(schedule["start_date"]).strftime("%d/%m/%Y") + " · hora sin confirmar"
+            except (ValueError, TypeError):
+                pass
+        if value and schedule.get("certainty") == "estimated":
+            value = "Orientativa · " + value
+    if value:
+        fields.append({"name": "📅 Fecha del evento", "value": _clip(value, 1024), "inline": False})
+    else:
+        period = data.get("event_period_text")
+        content = str(current.get("content", "")) + "\n" + str(data.get("summary", ""))
+        if isinstance(period, str) and period.strip() and period in content:
+            fields.append({"name": "📅 Período publicado del evento", "value": _discord_text(period, 700), "inline": False})
+        else:
+            fields.append({"name": "📅 Fecha del evento", "value": "Fecha u horario por confirmar", "inline": False})
+    location = []
+    for key in ("venue", "address", "city"):
+        value = data.get(key)
+        if isinstance(value, str) and value.strip() and value not in location:
+            location.append(value)
+    if location:
+        fields.append({"name": "📍 Lugar", "value": "\n".join(_discord_text(value, 300) for value in location)[:1024], "inline": False})
+    if data.get("entry_price_verified") is True:
+        price = _price({"data": {"price": data.get("entry_price"), "currency": data.get("entry_currency"), "price_verified": True}})
+        if price:
+            fields.append({"name": "🎟️ Inscripción", "value": price, "inline": True})
+    return fields
+
+
 def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
     """Render source facts only; semantic analysis never supplies commercial claims."""
     current, previous = event.data["current"], event.data.get("previous")
     data = current.get("data", {})
-    editorial = current.get("kind") in ("article", "announcement") or event.event_type in ("announcement.new", "publication.new")
+    from .profiles import event_profile
+    profile = event_profile(current, event.source)
+    tcg = profile.get("tcg")
+    is_event = current.get("kind") == "event" or event.event_type.startswith("event.")
+    editorial = current.get("kind") in ("article", "announcement") or event.event_type in ("announcement.new", "publication.new") or is_event
     icon, label, color = EVENT_STYLES.get(event.event_type, ("🔔", event.event_type, 0x60A5FA))
+    if event.event_type in ("announcement.new", "publication.new", "content.changed", "event.new", "event.updated"):
+        color = TCG_COLORS.get(tcg, color)
     state = _state(current)
     uncertain = event.event_type == "change.uncertain" or (not editorial and state is None)
     result = event.analysis.get("result", {}) if event.analysis else {}
@@ -206,28 +318,43 @@ def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
                    "price.changed": "La fuente muestra un cambio en el precio del producto.",
                    "release_date.changed": "La fuente ha actualizado la fecha prevista. Consulta los detalles del anuncio.",
                    "availability.changed": "La fuente muestra un cambio en la disponibilidad del producto.",
+                   "event.new": "La fuente ha anunciado un evento. Consulta la ubicación y las condiciones de participación.",
+                   "event.schedule_changed": "La fuente ha actualizado el horario del evento.",
+                   "event.cancelled": "La fuente indica que el evento ha sido cancelado.",
+                   "event.updated": "La fuente ha actualizado la información del evento.",
                    "content.changed": "La fuente ha actualizado la información de este elemento."}.get(event.event_type, "Nuevo elemento detectado en la fuente.")
     if uncertain:
         summary += "\n\n🔎 Información o interpretación incierta; consulta la fuente antes de darla por confirmada."
 
-    fields = [{"name": "📡 Fuente", "value": _discord_text(SOURCE_LABELS.get(event.source, event.source), 200), "inline": True}]
-    region = data.get("region")
+    fields = []
+    if tcg and tcg != "unknown":
+        fields.append({"name": "🃏 Juego", "value": _discord_text(TCG_LABELS.get(tcg, tcg), 200), "inline": True})
+    fields.append({"name": "📡 Fuente", "value": _discord_text(SOURCE_LABELS.get(event.source, event.source), 200), "inline": True})
+    region = profile.get("region")
     if region:
-        regions = {"EU": "Europa", "US": "Estados Unidos", "GLOBAL": "Internacional", "global": "Internacional"}
-        fields.append({"name": "🌍 Región", "value": _discord_text(regions.get(str(region), region), 100), "inline": True})
+        fields.append({"name": "🌍 Región", "value": _discord_text(REGION_LABELS.get(str(region), region), 100), "inline": True})
+    language = profile.get("language")
+    if language:
+        fields.append({"name": "🌐 Idioma de la fuente", "value": _discord_text(LANGUAGE_LABELS.get(str(language), language), 100), "inline": True})
+    channel = profile.get("channel")
+    if channel:
+        fields.append({"name": "🏷️ Canal", "value": _discord_text(CHANNEL_LABELS.get(str(channel), channel), 100), "inline": True})
     if state:
         old_state = _state(previous)
         value = f"{old_state} → {state}" if old_state and previous.get("state") != current.get("state") else state
         fields.append({"name": "📍 Estado" if editorial else "📦 Disponibilidad", "value": value, "inline": True})
-    price = _price(current)
+    price = _price(current) if not is_event else None
     if price:
         old_price = _price(previous)
         if event.event_type == "price.changed" and old_price:
             price = f"{old_price} → {price}"
         fields.append({"name": "💶 Precio observado", "value": price, "inline": True})
-    release = _release_schedule_field(current, previous, event.analysis, timezone, editorial)
-    if release:
-        fields.append(release)
+    if is_event:
+        fields.extend(_event_fields(current, timezone))
+    else:
+        release = _release_schedule_field(current, previous, event.analysis, timezone, editorial)
+        if release:
+            fields.append(release)
     try:
         instant = datetime.fromisoformat(event.occurred_at)
         if instant.tzinfo is None:
@@ -243,7 +370,7 @@ def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
     if url:
         # Only the trusted adapter's event URL becomes a clickable Markdown link.
         link_url = url.replace("\\", "%5C").replace("(", "%28").replace(")", "%29").replace("<", "%3C").replace(">", "%3E")
-        link = f"[Abrir {'anuncio' if editorial else 'fuente'} ↗](<{link_url}>)"
+        link = f"[Abrir {'evento' if is_event else 'anuncio' if editorial else 'fuente'} ↗](<{link_url}>)"
         fields.append({"name": "🔗 Detalles", "value": link if _units(link) <= 1024 else "Pulsa el título para consultar la fuente.", "inline": False})
 
     embed = {"author": {"name": _discord_text(f"{icon} {label}", 256)}, "title": _discord_text(event.title, 256) or "Nueva alerta",
@@ -333,19 +460,59 @@ class NotificationWorker:
     def __init__(self, settings, store, channel):
         self.settings, self.store, self.channel = settings, store, channel
 
+    def _configuration_allows(self, event: Event, rules) -> bool:
+        from .profiles import SOURCE_PROFILES, event_profile, normalize_tcg
+
+        cfg = self.settings.sources.get(event.source)
+        if cfg is None:
+            # Registered sources removed from the configuration are disabled.
+            # Generic domains and third-party adapters keep their existing rules.
+            if event.source in SOURCE_PROFILES:
+                return False
+        elif not isinstance(cfg, dict) or not cfg.get("enabled", True):
+            return False
+        game = event_profile(event.data["current"], event.source).get("tcg")
+        if game is not None and game not in {normalize_tcg(value) for value in self.settings.enabled_tcgs}:
+            return False
+        decision = rules.decide(event)
+        return decision.notify and (not decision.require_analysis or bool(event.analysis))
+
     async def tick(self):
+        from .rules import RuleEngine
+
         if not getattr(self.channel, "enabled", True) or getattr(self.channel, "blocked_until", 0) > time.time():
             return
-        for event, attempts in self.store.due_notifications(self.settings.notification_batch_size):
-            if getattr(self.channel, "blocked_until", 0) > time.time():
+        rules = RuleEngine(self.settings.rules)
+        remaining = self.settings.notification_batch_size
+        # Disabled records do not consume HTTP slots or starve an allowed item
+        # behind the first batch. Bound cleanup work when a large game is muted.
+        scan_limit = max(100, remaining * 10)
+        seen = set()
+        while remaining and len(seen) < scan_limit:
+            rows = self.store.due_notifications(min(remaining, scan_limit - len(seen)))
+            if not rows:
                 break
-            try:
-                await self.channel.send(event)
-            except DeliveryError as exc:
-                attempts += 1
-                delay = max(exc.retry_after, min(21600, 5 * 2 ** min(attempts, 12))) + random.uniform(0, 1)
-                self.store.notification_result(event.id, self.settings.notification_max_attempts if exc.permanent else attempts, exc.code, delay, self.settings.notification_max_attempts)
-                self.store.diagnostic("discord", exc.code, "Entrega pendiente" if not exc.permanent else "Entrega rechazada")
-            else:
-                self.store.notification_result(event.id, attempts + 1)
-            await asyncio.sleep(0.05)
+            progressed = False
+            for event, attempts in rows:
+                if event.id in seen:
+                    continue
+                if getattr(self.channel, "blocked_until", 0) > time.time():
+                    return
+                seen.add(event.id)
+                progressed = True
+                if not self._configuration_allows(event, rules):
+                    self.store.notification_skipped(event.id, "configuration_disabled")
+                    continue
+                remaining -= 1
+                try:
+                    await self.channel.send(event)
+                except DeliveryError as exc:
+                    attempts += 1
+                    delay = max(exc.retry_after, min(21600, 5 * 2 ** min(attempts, 12))) + random.uniform(0, 1)
+                    self.store.notification_result(event.id, self.settings.notification_max_attempts if exc.permanent else attempts, exc.code, delay, self.settings.notification_max_attempts)
+                    self.store.diagnostic("discord", exc.code, "Entrega pendiente" if not exc.permanent else "Entrega rechazada")
+                else:
+                    self.store.notification_result(event.id, attempts + 1)
+                await asyncio.sleep(0.05)
+            if not progressed:
+                break

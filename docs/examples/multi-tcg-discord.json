@@ -1,0 +1,190 @@
+{
+  "allowed_mentions": {
+    "parse": [],
+    "users": [],
+    "roles": [],
+    "replied_user": false
+  },
+  "embeds": [
+    {
+      "author": {
+        "name": "📣 Nuevo anuncio"
+      },
+      "title": "EJEMPLO FICTICIO · Próximo Secret Lair",
+      "description": "Aviso de muestra para ver una fecha y hora convertidas a Madrid. No corresponde a un lanzamiento real.",
+      "color": 10186239,
+      "footer": {
+        "text": "Drop Alerts · fictional-m…"
+      },
+      "url": "https://secretlair.wizards.com/eu/",
+      "timestamp": "2026-10-25T12:00:00+00:00",
+      "fields": [
+        {
+          "name": "🃏 Juego",
+          "value": "Magic: The Gathering",
+          "inline": true
+        },
+        {
+          "name": "📡 Fuente",
+          "value": "Secret Lair · Tienda EU",
+          "inline": true
+        },
+        {
+          "name": "🌍 Región",
+          "value": "Europa",
+          "inline": true
+        },
+        {
+          "name": "🌐 Idioma de la fuente",
+          "value": "Inglés",
+          "inline": true
+        },
+        {
+          "name": "🏷️ Canal",
+          "value": "Venta online",
+          "inline": true
+        },
+        {
+          "name": "📍 Estado",
+          "value": "Anunciado",
+          "inline": true
+        },
+        {
+          "name": "🗓️ Venta prevista",
+          "value": "02/11/2026 · 18:00 CET · hora de Madrid",
+          "inline": false
+        },
+        {
+          "name": "🕒 Detectado",
+          "value": "25/10/2026 · 13:00 CET",
+          "inline": true
+        },
+        {
+          "name": "🔗 Detalles",
+          "value": "[Abrir anuncio ↗](<https://secretlair.wizards.com/eu/>)",
+          "inline": false
+        }
+      ]
+    },
+    {
+      "author": {
+        "name": "📣 Nuevo anuncio"
+      },
+      "title": "EJEMPLO FICTICIO · Colección de One Piece",
+      "description": "Ficha de muestra de un producto para el mercado occidental. La aparición en catálogo no confirma stock en una tienda.",
+      "color": 15162198,
+      "footer": {
+        "text": "Drop Alerts · fictional-o…"
+      },
+      "url": "https://en.onepiece-cardgame.com/",
+      "timestamp": "2026-10-25T12:00:00+00:00",
+      "fields": [
+        {
+          "name": "🃏 Juego",
+          "value": "One Piece Card Game",
+          "inline": true
+        },
+        {
+          "name": "📡 Fuente",
+          "value": "One Piece · Catálogo oficial",
+          "inline": true
+        },
+        {
+          "name": "🌍 Región",
+          "value": "Occidente · incluye Europa",
+          "inline": true
+        },
+        {
+          "name": "🌐 Idioma de la fuente",
+          "value": "Inglés",
+          "inline": true
+        },
+        {
+          "name": "🏷️ Canal",
+          "value": "Tiendas",
+          "inline": true
+        },
+        {
+          "name": "📍 Estado",
+          "value": "Anunciado",
+          "inline": true
+        },
+        {
+          "name": "🗓️ Lanzamiento previsto",
+          "value": "13/11/2026 · hora sin confirmar",
+          "inline": false
+        },
+        {
+          "name": "🕒 Detectado",
+          "value": "25/10/2026 · 13:00 CET",
+          "inline": true
+        },
+        {
+          "name": "🔗 Detalles",
+          "value": "[Abrir anuncio ↗](<https://en.onepiece-cardgame.com/>)",
+          "inline": false
+        }
+      ]
+    },
+    {
+      "author": {
+        "name": "📣 Nuevo anuncio"
+      },
+      "title": "EJEMPLO FICTICIO · Producto especial Pokémon",
+      "description": "Anuncio de muestra para Estados Unidos. Su fecha y condiciones no acreditan venta o disponibilidad en Europa.",
+      "color": 15911244,
+      "footer": {
+        "text": "Drop Alerts · fictional-p…"
+      },
+      "url": "https://www.pokemon.com/us",
+      "timestamp": "2026-10-25T12:00:00+00:00",
+      "fields": [
+        {
+          "name": "🃏 Juego",
+          "value": "Pokémon TCG",
+          "inline": true
+        },
+        {
+          "name": "📡 Fuente",
+          "value": "Pokémon TCG · Galería oficial de Estados Unidos",
+          "inline": true
+        },
+        {
+          "name": "🌍 Región",
+          "value": "Estados Unidos",
+          "inline": true
+        },
+        {
+          "name": "🌐 Idioma de la fuente",
+          "value": "Inglés",
+          "inline": true
+        },
+        {
+          "name": "🏷️ Canal",
+          "value": "Catálogo",
+          "inline": true
+        },
+        {
+          "name": "📍 Estado",
+          "value": "Anunciado",
+          "inline": true
+        },
+        {
+          "name": "🗓️ Venta prevista",
+          "value": "20/11/2026 · hora sin confirmar",
+          "inline": false
+        },
+        {
+          "name": "🕒 Detectado",
+          "value": "25/10/2026 · 13:00 CET",
+          "inline": true
+        },
+        {
+          "name": "🔗 Detalles",
+          "value": "[Abrir anuncio ↗](<https://www.pokemon.com/us>)",
+          "inline": false
+        }
+      ]
+    }
+  ]
+}

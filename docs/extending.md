@@ -11,7 +11,7 @@ La interfaz `SourceAdapter` define `id` y `async fetch(http) -> FetchResult`. Un
 - `data`: hechos estructurados, incluida la evidencia usada para precio o disponibilidad.
 - `content`: fragmento relevante para interpretación, sin toda la navegación de la página.
 
-`observed_at` registra cuándo se observó y `engine` identifica la clasificación determinista o del modelo. `Item.digest` excluye ambos campos, además de `data.image_url`, `data.image_verified` y `data.announcement_url`: son pistas de presentación o identidad cuya incorporación no debe generar un cambio editorial por sí sola.
+`observed_at` registra cuándo se observó y `engine` identifica la clasificación determinista o del modelo. `Item.digest` excluye ambos campos, además de pistas de presentación e identidad (`data.image_url`, `data.image_verified`, `data.announcement_url`), el enriquecimiento de fecha del drop y `data.tcg`. Incorporar esas etiquetas por sí solo no debe generar un cambio editorial. Los hechos originales de precio, disponibilidad y fecha del torneo sí participan en la comparación.
 
 Implementa el módulo en `drop_alerts/sources/`, regístralo donde se construyen los adaptadores y añade su opción de activación al archivo TOML. Utiliza el transporte compartido para conexiones, límites y consultas condicionales. Nunca conviertas una excepción HTTP, un documento vacío o un selector que dejó de existir en una lista de productos agotados: lanza `ExtractionError` y conserva el último estado correcto.
 
@@ -35,7 +35,7 @@ Los apartados `sources` y `rules` de un TOML personalizado sustituyen los valore
 
 ## Reglas
 
-Las reglas del TOML son datos, no código ejecutable. Admiten `sources`, `kinds`, `event_types`, `keywords` y `states`:
+Las reglas del TOML son datos, no código ejecutable. Admiten `sources`, `kinds`, `event_types`, `keywords`, `states`, `tcgs`, `regions`, `cities` y `channels`:
 
 ```toml
 [[rules]]
@@ -52,6 +52,18 @@ require_analysis = false
 Los filtros no vacíos deben coincidir y los valores de cada filtro ofrecen alternativas. Una lista vacía acepta cualquier valor de ese campo. Mantén identificadores de regla estables. Para una condición nueva, amplía el motor de reglas con un predicado determinista y una prueba que muestre cuándo coincide y cuándo no. Una categoría nueva puede viajar en `kind`, los datos y el evento sin crear una tabla por dominio.
 
 `require_analysis=true` reserva una regla para casos cuya interpretación necesita un análisis válido. No debe convertir un fallo del modelo en un cambio de disponibilidad ni impedir el seguimiento de otras fuentes. Para avisos respaldados por datos explícitos, conserva reglas con `require_analysis=false`.
+
+## Juegos, regiones y torneos
+
+Registra metadatos deterministas en `profiles.SOURCE_PROFILES`. Para una fuente de un único juego usa `tcg`; para un calendario mixto declara `tcgs` y etiqueta cada evento por su propio título o categoría. Añade la etiqueta de presentación en `TCG_LABELS` y, si hacen falta, alias en `normalize_tcg`. La selección global se configura con `[games].enabled` o `ENABLED_TCGS` (la variable gana). Los dominios genéricos sin etiqueta de juego siguen siendo válidos.
+
+Los datos del elemento pueden especificar `region`, `regions`, `language`, `country`, `city`, `venue`, `timezone` y `channel`. El idioma no demuestra un mercado de venta. Un anuncio internacional no demuestra stock local. Los filtros de región admiten tanto la región principal como los mercados explícitos: `WESTERN` y `EU` pueden coincidir con el mismo anuncio occidental. Los filtros de juego, ciudad y canal normalizan mayúsculas y acentos.
+
+Un torneo usa `kind="event"`, estados propios como `SCHEDULED`, `CANCELLED` o `POSTPONED`, y `data.event_schedule` validado con `event_schedule.py`. Conserva la evidencia literal en `content`. Una fecha sin hora mantiene esa incertidumbre; nunca asigna la hora de publicación al torneo. Para horarios locales, declara la zona del lugar y rechaza horas ambiguas o inexistentes por cambio de hora. Los periodos sin sesiones concretas pueden mostrarse como `event_period_text`, sin expandirlos en repeticiones inventadas.
+
+Los eventos de calendario generan `event.new`, `event.schedule_changed`, `event.cancelled` o `event.updated`. El precio de inscripción se guarda como `entry_price`, `entry_currency` y `entry_price_verified`, separado del precio de un producto. Un cero sin explicación en un agregador no prueba gratuidad, y el aforo no indica plazas restantes. `event_reference_url` solo puede deduplicar referencias explícitas admitidas en `identities.py`; nombres parecidos no bastan para unir torneos o mercados distintos.
+
+Al desactivar un juego, fuente o regla, las notificaciones pendientes que dejan de cumplir la configuración pasan a `skipped`. Se conservan eventos e historial; reactivar la configuración no reproduce esa cola antigua. Consulta [multi-tcg.md](multi-tcg.md) para ejemplos completos.
 
 ## Analizadores
 

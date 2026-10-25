@@ -86,7 +86,7 @@ ABSOLUTE = re.compile(
     r"\b(?:(?P<iso>20\d{2}-\d{2}-\d{2})|"
     r"(?P<m1>" + MONTH + r")\.?\s+(?P<d1>\d{1,2})(?:st|nd|rd|th)?(?:\s*,?\s*(?P<y1>20\d{2}))?|"
     r"(?P<d2>\d{1,2})(?:st|nd|rd|th)?\s+(?:de\s+)?(?P<m2>" + MONTH + r")\.?(?:\s+(?:de\s+)?(?P<y2>20\d{2}))?)\b", re.I)
-SALE = re.compile(r"\bon\s+sale\b|\bsales?\s+(?:begin|start|open)|\bsale\s+(?:window|date)\b|\bfecha\s+de\s+venta\b|\b(?:available|availability|available\s+to\s+order)\b|(?<!pre-)(?<!pre )\border(?:ing|s)?\s+(?:open|begin|start)|\ba\s+la\s+venta\b|\bdisponible\b|\bventa(?:s)?\s+(?:empieza|comienza|abre)", re.I)
+SALE = re.compile(r"\bon\s+sale\b|\bsales?\s+(?:begin|start|open)|\bsale\s+(?:window|date)\b|\bsales?\s+(?:(?:was|is)\s+)?announced(?:\s+today)?\s+for\b|\bfecha\s+de\s+venta\b|\b(?:available|availability|available\s+to\s+order)\b|(?<!pre-)(?<!pre )\border(?:ing|s)?\s+(?:open|begin|start)|\ba\s+la\s+venta\b|\bdisponible\b|\bventa(?:s)?\s+(?:empieza|comienza|abre)", re.I)
 PREORDER = re.compile(r"\bpre[ -]?order(?:s|ing)?\b|\bpreventa\b|\breservas?\s+(?:abre|comienza|empieza)", re.I)
 RELEASE = re.compile(r"\blaunch(?:es|ing)?\b|\breleas(?:e|es|ing)\b|\barriv(?:e|es|ing)\b|\bcoming(?:\s+to)?\b|\bdrop\s+date\b|\b(?:drop|superdrop|kit|collection|product)\s+(?:(?:is|comes|will\s+be)\s+)?out\s+(?:on\s+)?|(?:^|[—–:])\s*out\s+(?:on\s+)?|\blanzamiento\b|\bse\s+lanza\b|\bllega\b|\bsale\s+el\b|\bsaldr[aá]\b", re.I)
 EXCLUDED = re.compile(r"\bship(?:s|ped|ping)?\b|\bfulfil(?:lment|ment)\b|\bdeliver(?:y|ies|ed)?\b|\blegal(?:ity)?\b|\bformats?\b|\bprerelease\s+events?\b|\bsold\s+out\b|\bagotad[oa]\b|\bpublished\b|\bpublication\b|\bposted\b|\bupdated\b|\benv[ií]o\b|\bentrega\b|\blegalidad\b|\bpublicad[oa]\b|\bpublicaci[oó]n\b|\bactualizad[oa]\b|\bconvenci[oó]n\b|\bconvention\b", re.I)
@@ -96,6 +96,7 @@ NEGATED = re.compile(r"\bnot\b|\bno\s+longer\b|\bno\s+(?:estar[aá]|saldr[aá]|s
 HISTORICAL = re.compile(r"\boriginally\b|\bpreviously\b|\binitially\b|\boriginalmente\b|\banteriormente\b", re.I)
 CORRECTED = re.compile(r"\bnow\b|\binstead\b|\brescheduled\b|\bahora\b|\breprogramad[oa]\b", re.I)
 RELATIVE = re.compile(r"\b(?:tomorrow|today|ma[ñn]ana|hoy)\b", re.I)
+EDITORIAL_RELATIVE = re.compile(r"\bannounc(?:e|es|ed|ing)\b|\breveal(?:s|ed|ing)?\b|\banunci(?:a|ar|ado|ada|o|ó|aron|amos)\b|\brevel(?:a|ar|ado|ada|o|ó|aron|amos)\b", re.I)
 UNSAFE_INSTRUCTION = re.compile(r"\b(?:ignore|disregard|obey)\b.{0,70}\b(?:instructions?|rules?|prompts?)\b|\b(?:system(?:\s+prompt)?|instructions?|pretend|override|commands?|execute|configuration|configuraci[oó]n|ejecuta|instrucciones|assistant|reveal\s+secrets?|return\s+json|output\s+json)\b|\b(?:set|use|return|output)\b.{0,30}\b(?:release_date|date_kind|date)\b", re.I)
 DELAYED = re.compile(r"\bdelay(?:ed|s)?\b|\bpostponed\b|\bretrasad[oa]\b|\baplazad[oa]\b", re.I)
 CORROBORATION_EXCLUDED = re.compile(r"\b(?:birthday|anniversary|cumplea[ñn]os|aniversario|convention|convenci[oó]n|tournament|torneo|historical|hist[oó]rico|celebration|celebraci[oó]n|event\s+date|fecha\s+del\s+evento)\b", re.I)
@@ -171,10 +172,19 @@ def _resolve(month, day, year, publication):
         return None, inferred
 
 
-def _kind(segment, start, end):
+def _kind(segment, start, end, *, relative=False):
     before, after = segment[:start], segment[end:]
+    patterns = ((SALE, "sale"), (PREORDER, "preorder"), (RELEASE, "release"), (EXCLUDED, "excluded"))
+    if relative:
+        patterns += ((EDITORIAL_RELATIVE, "excluded"),)
+        # A short leading "Today the company announced..." belongs to the
+        # publication, even when a preceding heading mentions a new release.
+        line_prefix = before.rsplit("\n", 1)[-1]
+        editorial = EDITORIAL_RELATIVE.search(after[:100])
+        if editorial and len(line_prefix.strip()) <= 60 and not any(pattern.search(line_prefix) for pattern in (SALE, PREORDER, RELEASE)):
+            return "excluded", before[-180:]
     markers = []
-    for pattern, kind in ((SALE, "sale"), (PREORDER, "preorder"), (RELEASE, "release"), (EXCLUDED, "excluded")):
+    for pattern, kind in patterns:
         matches = list(pattern.finditer(before))
         if matches and start - matches[-1].end() <= 180:
             markers.append((matches[-1].end(), kind, matches[-1].start()))
@@ -190,7 +200,10 @@ def _kind(segment, start, end):
         return kind, before[-180:]
     # English often writes "October 23 release date" after the date itself.
     following = []
-    for pattern, kind in ((EXCLUDED, "excluded"), (SALE, "sale"), (PREORDER, "preorder"), (RELEASE, "release")):
+    following_patterns = ((EXCLUDED, "excluded"), (SALE, "sale"), (PREORDER, "preorder"), (RELEASE, "release"))
+    if relative:
+        following_patterns += ((EDITORIAL_RELATIVE, "excluded"),)
+    for pattern, kind in following_patterns:
         match = pattern.search(after[:180])
         if match:
             following.append((match.start(), kind))
@@ -369,7 +382,7 @@ def extract_release_schedule(content: str, published_at: str | None = None) -> d
             candidates.append(_Candidate(value, endpoint, clock, zone, kind, "estimated" if estimated else "explicit",
                                          segment[evidence_start:evidence_end][:500], inferred, note))
         for match in RELATIVE.finditer(segment):
-            kind, cue = _kind(segment, match.start(), match.end())
+            kind, cue = _kind(segment, match.start(), match.end(), relative=True)
             if kind is None or kind == "excluded" or NEGATED.search(cue[-65:]):
                 continue
             if publication is None:

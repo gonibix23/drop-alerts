@@ -71,7 +71,33 @@ async def check_llm(settings) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Drop Alerts")
-    parser.add_argument("command", nargs="?", default="run", choices=["run", "once", "doctor", "check-llm", "status", "health", "prune", "retry-notifications"])
+    commands = parser.add_subparsers(dest="command")
+    parser.set_defaults(command="run")
+    for command in ("run", "once", "doctor", "check-llm", "status", "health", "prune", "retry-notifications"):
+        commands.add_parser(command)
+    from .inspection import KINDS, tcg_filter
+    def tcg_argument(value):
+        try:
+            return tcg_filter(value)
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(str(exc)) from None
+    def limit_argument(value):
+        try:
+            limit = int(value)
+        except ValueError:
+            raise argparse.ArgumentTypeError("El límite debe ser un entero entre 1 y 100") from None
+        if not 1 <= limit <= 100:
+            raise argparse.ArgumentTypeError("El límite debe estar entre 1 y 100")
+        return limit
+    events = commands.add_parser("events", help="Consultar alertas guardadas, sin modificar su estado")
+    events.add_argument("--tcg", type=tcg_argument)
+    events.add_argument("--kind", choices=KINDS)
+    events.add_argument("--limit", type=limit_argument, default=10)
+    events.add_argument("--json", action="store_true", dest="as_json")
+    preview = commands.add_parser("preview", help="Ver o enviar explícitamente una vista previa del último evento")
+    preview.add_argument("--tcg", type=tcg_argument)
+    preview.add_argument("--kind", choices=KINDS)
+    preview.add_argument("--send", action="store_true")
     args = parser.parse_args()
     try:
         settings = Settings.from_env()
@@ -85,6 +111,11 @@ def main() -> int:
         return asyncio.run(doctor(settings))
     if args.command == "check-llm":
         return asyncio.run(check_llm(settings))
+    if args.command in ("events", "preview"):
+        from .inspection import inspect_command
+        return asyncio.run(inspect_command(settings, args.command, tcg=args.tcg, kind=args.kind,
+                                          limit=getattr(args, "limit", 10), send=getattr(args, "send", False),
+                                          as_json=getattr(args, "as_json", False)))
     logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.CRITICAL)
     logging.getLogger("httpcore").setLevel(logging.CRITICAL)

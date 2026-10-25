@@ -2,6 +2,18 @@
 
 Comprobado el 21 de octubre de 2026. El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts).
 
+## Actualización 1.3: varios TCG y calendarios (25/10/2026)
+
+- `python -m pytest -q --basetemp work/pytest-multi-tcg-release-final`: **662 pruebas aprobadas**, Python 3.14 en Windows. Incluyen los adaptadores nuevos con respuestas guardadas, selección por juego, filtros de región/ciudad/canal, fechas de torneos y sus zonas horarias, deduplicación, compatibilidad con eventos antiguos, consultas de solo lectura y desactivación de notificaciones pendientes. También verifican que endurecer una regla para exigir análisis no envía mensajes anteriores sin ese análisis.
+- Comprobación HTTPS real conjunta de las **14 fuentes activas** con `SourceHTTP` y TLS verificado: todas devolvieron contenido válido, sin errores parciales. Se utilizó una SQLite en memoria, con IA y webhook desactivados; el arranque silencioso dejó **0 notificaciones pendientes**. Las consultas limitaron el número de detalles y no equivalen a una exploración histórica completa.
+- Se consultó el contenido del chat compartido y se investigaron sus **25 tiendas**. Se verificaron 23 perfiles públicos con JSON-LD de eventos y alternativas directas para Next Dice y Júpiter Guadalajara. El inventario de procedencia y activación está en [local-stores-coverage.json](local-stores-coverage.json); por defecto se revisan ocho tiendas cercanas. Un calendario válido sin torneos de los tres juegos seleccionados es un resultado vacío correcto.
+- Los calendarios directos adicionales se comprobaron por separado con transporte real: Next Dice, Arte9 (iCalendar), Ludoteca Maldita y Júpiter Guadalajara (octubre y noviembre). No se generaron recurrencias futuras ni se dedujeron plazas disponibles a partir del aforo.
+- Las galerías de productos de Pokémon quedaron opcionales por respuestas intermitentes de bloqueo; Pokémon Center devolvió HTTP 403. Las fuentes activas de Pokémon son el portal TCG y su prensa oficial en español. No se implementa stock de Pokémon Center ni se interpreta el idioma español como disponibilidad en España.
+- `docker compose --env-file .env.example config --quiet`: configuración válida. `pip check`: sin incompatibilidades. Las nuevas fuentes no añaden dependencias de ejecución, puertos ni contenedores. Se volvió a consultar el motor Docker local y el pipe `docker_engine` sigue ausente; la construcción y ejecución de esta revisión se comprueban en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions).
+- El esquema SQLite sigue en **2**. El enriquecimiento de juego en registros antiguos es silencioso y no recrea eventos ni entregas. Las vistas previas son ficticias; las pruebas y verificaciones de esta versión no enviaron mensajes a Discord ni hicieron inferencias reales.
+
+Véanse [cobertura y configuración multi-TCG](multi-tcg.md), [consultas y prueba de mensajes](inspecting-alerts.md) y los estudios de [One Piece](research-one-piece-sources.md), [Pokémon](research-pokemon-sources.md) y [calendarios de tiendas](research-store-calendars.md). Las verificaciones siguientes son históricas.
+
 ## Actualización 1.2: fecha prevista del drop
 
 - `python -m pytest -q --basetemp work/pytest-release-1-2-final-check`: **428 pruebas aprobadas**, Python 3.14 en Windows. Incluyen extracción temporal en inglés/español, ventanas, zonas horarias, negaciones, encabezados de envío/legalidad, fecha orientativa por selección semántica y reintentos sin duplicados.

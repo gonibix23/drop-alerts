@@ -8,8 +8,9 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .models import Event, FetchResult, Item, canonical_json, fingerprint, utcnow
-from .identities import announcement_url
+from .identities import announcement_url, event_reference_url
 from .schedule_enrichment import enrich_item, should_analyze_schedule, source_text
+from .profiles import enrich_game, game_enabled, event_profile
 
 
 class Store:
@@ -66,10 +67,17 @@ class Store:
 
     @staticmethod
     def announcement_identity(event: Event) -> str | None:
-        if event.event_type not in ("announcement.new", "publication.new"):
+        if event.event_type not in ("announcement.new", "publication.new", "event.new"):
             return None
         data = event.data["current"].get("data", {})
-        return announcement_url(data.get("announcement_url", "")) or announcement_url(event.url)
+        profile = event_profile(event.data["current"], event.source)
+        game, region = profile.get("tcg", ""), profile.get("region", "")
+        if event.event_type == "event.new":
+            identity = event_reference_url(data.get("event_reference_url", "")) or event_reference_url(event.url)
+            return f"event|{game}|{region}|{identity}" if identity else None
+        identity = announcement_url(data.get("announcement_url", "")) or announcement_url(event.url)
+        # Preserve existing Magic keys; separate other games and sales regions.
+        return f"announcement|{game}|{region}|{identity}" if identity and game and game != "magic" else identity
 
     def close(self):
         self.db.close()
@@ -143,13 +151,16 @@ class Store:
                     if isinstance(item_id, str):
                         self.db.execute("INSERT OR IGNORE INTO bootstrap_items VALUES(?,?)", (source, item_id))
             for current in result.items:
+                enrich_game(current)
                 enrich_item(current)
                 previous, revision = self.item(source, current.id)
                 historical = previous is None and self.db.execute("SELECT 1 FROM bootstrap_items WHERE source=? AND id=?", (source, current.id)).fetchone() is not None
                 if previous and current.digest == previous.digest:
                     # Enrich an existing snapshot without inventing a revision,
                     # event or duplicate delivery solely because the parser is new.
-                    if previous.data.get("release_schedule") != current.data.get("release_schedule") or previous.data.get("release_schedule_version") != current.data.get("release_schedule_version"):
+                    if (previous.data.get("release_schedule") != current.data.get("release_schedule")
+                            or previous.data.get("release_schedule_version") != current.data.get("release_schedule_version")
+                            or previous.data.get("tcg") != current.data.get("tcg")):
                         self.db.execute("UPDATE items SET payload=? WHERE source=? AND id=?", (canonical_json(asdict(current)), source, current.id))
                     continue
                 revision += 1
@@ -167,7 +178,7 @@ class Store:
                         duplicate = existing is not None and existing[0] != event.id
                         if not existing:
                             self.db.execute("INSERT INTO announcement_claims VALUES(?,?,?)", (identity, event.id, time.time()))
-                    if not silent and not historical and decision.notify and not duplicate:
+                    if not silent and not historical and decision.notify and not duplicate and game_enabled(asdict(current), settings.enabled_tcgs):
                         status = "waiting_analysis" if decision.require_analysis else "pending"
                         self.db.execute("INSERT OR IGNORE INTO outbox(event_id,status) VALUES(?,?)", (event.id, status))
                         task = "change" if previous and event.event_type in ("content.changed", "change.uncertain") else "classification"
@@ -250,6 +261,15 @@ class Store:
         with self.transaction():
             self.db.execute("UPDATE outbox SET status=?,attempts=?,next_attempt=?,last_error=?,delivered=? WHERE event_id=?", (status, attempts, time.time() + retry_after, error, time.time() if status == "sent" else None, event_id))
             self.db.execute("INSERT INTO notification_history(event_id,attempt,outcome,created) VALUES(?,?,?,?)", (event_id, attempts, error or "sent", time.time()))
+
+    def notification_skipped(self, event_id: str, reason: str):
+        """Close a disabled delivery without an HTTP attempt or changing backoff."""
+        with self.transaction():
+            row = self.db.execute("SELECT attempts FROM outbox WHERE event_id=? AND status IN ('pending','waiting_analysis')", (event_id,)).fetchone()
+            if row is None:
+                return
+            self.db.execute("UPDATE outbox SET status='skipped',last_error=? WHERE event_id=?", (reason, event_id))
+            self.db.execute("INSERT INTO notification_history(event_id,attempt,outcome,created) VALUES(?,?,?,?)", (event_id, row[0], reason, time.time()))
 
     def stats(self):
         return {

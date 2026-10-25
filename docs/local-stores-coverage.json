@@ -1,0 +1,894 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-25",
+  "scope": "Las 25 tiendas citadas en los dos mensajes del chat público compartido; cercanía a Alcalá de Henares y Torrejón de Ardoz, Madrid y Guadalajara España.",
+  "counts": {
+    "stores": 25,
+    "verified_aggregator_profiles": 23,
+    "without_verified_aggregator_profile": 2,
+    "stores_with_verified_usable_calendar": 25,
+    "implemented_direct_adapters": 6
+  },
+  "status_definitions": {
+    "implemented_via_aggregator": "Perfil público GET 200 con Event JSON-LD compatible con el adaptador genérico. No implica que esté activado por defecto ni cobertura completa.",
+    "candidate": "No hay perfil del agregador comprobado; se documenta calendario directo y, cuando existe, su adaptador opcional.",
+    "blocked": "No se ha encontrado una alternativa comprobada al acceso bloqueado.",
+    "social_only": "Sólo se ha encontrado comunicación social sin calendario público estructurado comprobado."
+  },
+  "global_limitations": [
+    "La disponibilidad de un calendario no demuestra que una partida se celebre ni que queden plazas; confirmar con la tienda.",
+    "El agregador es una fuente secundaria; el mensaje conserva su procedencia y enlace de inscripción cuando está publicado.",
+    "Un precio cero de un agregador se trata como tarifa desconocida, no como entrada gratuita verificada.",
+    "Las redes sociales originales no se rastrean ni requieren credenciales; las alternativas son calendarios HTML/JSON-LD públicos.",
+    "Los 25 comercios están inventariados; sólo los perfiles configurados se consultan en ejecución. No se escanea todo el directorio ni se siguen URLs propuestas por IA."
+  ],
+  "stores": [
+    {
+      "store": "Medusa Cómics",
+      "city": "Alcalá de Henares",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.instagram.com/comicsmedusa/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "nearby",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "medusa-comics",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/medusa-comics",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/alcala-de-henares",
+        "jsonld_events_observed": 10,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcalá de Henares"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Alcalá Cómics",
+      "city": "Alcalá de Henares",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.alcalacomics.com/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "nearby",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "alcala-comics",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/alcala-comics",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/alcala-de-henares",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcalá de Henares"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Gladius Games",
+      "city": "Alcalá de Henares",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://gladiusgames.net/es/238-torneos-tcg",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "direct",
+      "direct_adapter": "gladius_events",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "gladius-games",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/gladius-games",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/alcala-de-henares",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "magic",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcalá de Henares"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "El perfil del agregador es una alternativa comprobada; el adaptador directo evita duplicar el mismo calendario en la configuración inicial."
+      ]
+    },
+    {
+      "store": "Mundicomics",
+      "city": "Torrejón de Ardoz",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.mundicomics.com/torneos-tcg",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "direct",
+      "direct_adapter": "mundicomics_events",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "mundicomics",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/mundicomics",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/jugar/one-piece/comunidad-de-madrid/torrejon-de-ardoz",
+        "jsonld_events_observed": 5,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Torrejón de Ardoz"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "El perfil del agregador es una alternativa comprobada; el adaptador directo evita duplicar el mismo calendario en la configuración inicial."
+      ]
+    },
+    {
+      "store": "Torrejugones",
+      "city": "Torrejón de Ardoz",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.instagram.com/torrejugones/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "nearby",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "torrejugones",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/torrejugones",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/jugar/one-piece/comunidad-de-madrid/torrejon-de-ardoz",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Torrejón de Ardoz"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Júpiter Guadalajara",
+      "city": "Guadalajara",
+      "administrative_region": "Castilla-La Mancha",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://jupiterjuegos.com/tiendas/guadalajara/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "direct",
+      "status": "candidate",
+      "status_note": "Sin perfil del agregador descubierto; el adaptador directo jupiter_guadalajara_events está implementado y comprobado con SourceHTTP contra el servidor real. Fuente opcional.",
+      "calendar": {
+        "url": "https://jupiterjuegos.com/tiendas/guadalajara/",
+        "http_status": 200,
+        "method": "GET HTTPS; calendario HTML estático, sin JSON-LD Event",
+        "provenance": "official",
+        "evidence": [
+          "Celdas .semana_actual_no/.semana_actual_si con día, nombre de día y .calendario_igualar_alturas.",
+          "Enlaces /tiendas/actividad/665/ para Pokémon y /661/ para Commander con hora dentro de cada celda."
+        ],
+        "navigation_observed": "https://jupiterjuegos.com/tiendas/guadalajara/?fecha=01-11-2026",
+        "activity_example_url": "https://jupiterjuegos.com/tiendas/actividad/665/",
+        "adapter": "JupiterGuadalajaraEventsSource",
+        "verified_target_occurrences": {
+          "2026-10": 24,
+          "2026-11": 21
+        },
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "next_page_checked": "https://jupiterjuegos.com/tiendas/guadalajara/?fecha=01-11-2026",
+        "transport_check": "fetch completo con SourceHTTP, TLS verificado, sin errores; 45 sesiones de calendario, dos GET públicos."
+      },
+      "limitations": [
+        "La misma URL de actividad se repite en fechas distintas: la identidad debe incluir fecha/hora.",
+        "El adaptador valida la cabecera mensual, día de semana y secuencia completa de celdas; descarta el contexto de meses limítrofes para evitar duplicados entre páginas.",
+        "Una búsqueda indexada mostró un evento de Pokémon del 25 de octubre, ya ausente en el GET regional actual; no se usa la caché de búsqueda para crear alertas.",
+        "Guadalajara España (Castilla-La Mancha); no confundir con calendarios de Guadalajara México.",
+        "Identidad serie+fecha+slot: cambiar de hora conserva la identidad; mover una sesión a otro día no puede correlacionarse con seguridad y genera otra ocurrencia."
+      ],
+      "direct_adapter": "jupiter_guadalajara_events"
+    },
+    {
+      "store": "Next Dice",
+      "city": "Algete",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://nextdice.es/eventos/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "direct",
+      "direct_adapter": "nextdice_events",
+      "status": "candidate",
+      "status_note": "Sin perfil del agregador descubierto; el adaptador directo nextdice_events está implementado como fuente opcional.",
+      "calendar": {
+        "url": "https://nextdice.es/eventos/",
+        "http_status": 200,
+        "method": "GET HTTPS; tarjetas de eventos HTML renderizadas en servidor con data-start y categoría propia",
+        "provenance": "official",
+        "adapter": "nextdice_events",
+        "evidence": [
+          "Tarjetas de eventos fechadas en /eventos/.",
+          "Detalle One Piece enlazado desde el listado, comprobado con GET 200."
+        ]
+      },
+      "limitations": [
+        "Incluye archivo de eventos; el adaptador distingue fecha de evento de fecha editorial.",
+        "No se inventa un slug del agregador para esta tienda."
+      ]
+    },
+    {
+      "store": "Factory Cards",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://factorycardstcg.com/pages/contact",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "factory-cards",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/factory-cards",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 6,
+        "target_tcgs_observed": [
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "TCG Box",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.instagram.com/tcgboxstore/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "tcg-box",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/tcg-box",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 6,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Ludoteca Maldita",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://ludotecamaldita.com/eventos/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "direct",
+      "direct_adapter": "ludoteca_events",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "ludoteca-maldita",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/ludoteca-maldita",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 12,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "El perfil del agregador es una alternativa comprobada; el adaptador directo evita duplicar el mismo calendario en la configuración inicial."
+      ]
+    },
+    {
+      "store": "Tempest Store",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://tempeststore.com/events",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "tempest-store",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/tempest-store",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "La página propia /events devolvió una carcasa HTML sin eventos extraíbles; se usa el agregador."
+      ]
+    },
+    {
+      "store": "Tablerum",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://tablerum.com/tienda",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "tablerum",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/tablerum",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Kingdom Wargames",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://madrid.kingdomwargames.com/categoria/eventos/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "kingdom-wargames",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/kingdom-wargames",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 12,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Troopertoys",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://troopertoys.com/es/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "troopertoys",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/troopertoys",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 10,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Arte9",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://arte9.com/torneos/categoria/one-piece/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "direct",
+      "direct_adapter": "arte9_events",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "arte-9",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/arte-9",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 6,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "El perfil del agregador es una alternativa comprobada; el adaptador directo evita duplicar el mismo calendario en la configuración inicial."
+      ]
+    },
+    {
+      "store": "OZ Juegos",
+      "city": "Alcobendas",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://ozjuegos.com/eventos/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "oz-juegos",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/oz-juegos",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/tiendas/oz-juegos",
+        "jsonld_events_observed": 10,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcobendas"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Júpiter Alcobendas / Madrid Norte",
+      "city": "Alcobendas",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://jupiterjuegos.com/tiendas/alcobendas/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "jupiter-madrid-norte",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/jupiter-madrid-norte",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/tiendas/oz-juegos",
+        "jsonld_events_observed": 4,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcobendas"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Ítaca",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://itaca.gg/tournament/month",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "itaca",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/itaca",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 12,
+        "target_tcgs_observed": [
+          "magic"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "La consulta directa del calendario propio falló por conexión; el calendario del agregador sí se comprobó."
+      ]
+    },
+    {
+      "store": "Metrópolis Center",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://metropolis-center.com/es/events/calendar?tag_name=One+Piece",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "metropolis-center",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/metropolis-center",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 12,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "El calendario propio devolvió HTTP 403; se usa el agregador sin sortear el bloqueo."
+      ]
+    },
+    {
+      "store": "Micelion Games",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://miceliongames.com/class/liga-one-piece-berrie-league/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "micelion-games",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/micelion-games",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 12,
+        "target_tcgs_observed": [
+          "magic",
+          "one_piece",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Ninpo Store",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://ninpostore.com/pages/eventos",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "ninpo-store",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/ninpo-store",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 2,
+        "target_tcgs_observed": [],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "La captura sólo contiene otros TCG (Lorcana); no se ha comprobado una sesión actual de Magic, One Piece o Pokémon en esta tienda."
+      ]
+    },
+    {
+      "store": "TCG Academy Madrid",
+      "city": "Torrejón de Ardoz",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.tcgacademy.es/tiendas/madrid",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "nearby_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "tcg-academy-madrid",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/tcg-academy-madrid",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/jugar/one-piece/comunidad-de-madrid/torrejon-de-ardoz",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Torrejón de Ardoz"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Hobby Shop Wargames",
+      "city": "Alcalá de Henares",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://hobbyshopwargames.es/eventos/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "nearby",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "hobbyshop-wargames",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/hobbyshop-wargames",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/alcala-de-henares",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "magic",
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcalá de Henares"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Tsuki Center",
+      "city": "Alcalá de Henares",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.instagram.com/tsuki_center/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "nearby_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "tsuki-center",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/tsuki-center",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/alcala-de-henares",
+        "jsonld_events_observed": 3,
+        "target_tcgs_observed": [
+          "one_piece"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Alcalá de Henares"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta."
+      ]
+    },
+    {
+      "store": "Ego Ludo / Generación X Las Musas",
+      "city": "Madrid",
+      "administrative_region": "Comunidad de Madrid",
+      "region": "EU",
+      "country": "ES",
+      "origin_url": "https://www.instagram.com/genxlasmusas/",
+      "origin_note": "URL proporcionada en el chat compartido; la comprobación documentada corresponde al calendario indicado.",
+      "checked_on": "2026-10-25",
+      "integration_profile": "madrid_extra",
+      "status": "implemented_via_aggregator",
+      "aggregator_slug": "ego-ludo",
+      "calendar": {
+        "url": "https://dondejugartcg.com/es/tiendas/ego-ludo",
+        "http_status": 200,
+        "method": "GET HTTPS con TLS verificado; JSON-LD Event en HTML estático",
+        "provenance": "secondary",
+        "discovered_from": "https://dondejugartcg.com/es/torneos/todos/comunidad-de-madrid/madrid",
+        "jsonld_events_observed": 4,
+        "target_tcgs_observed": [
+          "pokemon"
+        ],
+        "evidence": [
+          "JSON-LD Event con name/startDate/location.address.addressLocality",
+          "Ciudad contrastada en location: Madrid"
+        ],
+        "adapter": "LocalTCGEventsSource"
+      },
+      "limitations": [
+        "Ventana parcial del agregador, sin garantía de exhaustividad ni de que todos los eventos sean futuros.",
+        "Los eventos se filtran por juego; no se generan sesiones a partir de una recurrencia supuesta.",
+        "El nombre antiguo del chat y Ego Ludo representan una sola tienda, no dos fuentes distintas."
+      ],
+      "aliases": [
+        "Ego Ludo",
+        "Generación X Las Musas"
+      ]
+    }
+  ]
+}

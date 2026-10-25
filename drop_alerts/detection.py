@@ -4,6 +4,7 @@ from dataclasses import asdict
 
 from .models import Event, Item, fingerprint
 from .schedule_enrichment import effective_release_schedule, schedule_identity, source_text
+from .event_schedule import event_schedule_changed
 
 
 class DetectionEngine:
@@ -14,7 +15,14 @@ class DetectionEngine:
             return []
         types: list[str] = []
         if previous is None:
-            types = [{"product": "product.new", "collection": "collection.new", "announcement": "announcement.new", "article": "publication.new"}.get(current.kind, "item.new")]
+            types = [{"product": "product.new", "collection": "collection.new", "announcement": "announcement.new", "article": "publication.new", "event": "event.new"}.get(current.kind, "item.new")]
+        elif current.kind == "event":
+            if previous.state != current.state and current.state == "CANCELLED":
+                types.append("event.cancelled")
+            elif event_schedule_changed(asdict(previous), asdict(current)):
+                types.append("event.schedule_changed")
+            if not types:
+                types.append("event.updated")
         else:
             if previous.state != current.state:
                 if current.state == "UNKNOWN":

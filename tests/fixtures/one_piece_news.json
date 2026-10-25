@@ -1,0 +1,237 @@
+{
+  "statusCode": 200,
+  "data": {
+    "apiStatus": true,
+    "total_count": 137,
+    "start": 0,
+    "limit": 10,
+    "count": 5,
+    "time": 0,
+    "article_list": [
+      {
+        "title": "CARD LIST EXTRA BOOSTER -ONE PIECE HEROINES EDITION vol.2- [EB-05] has been announced.",
+        "thumbnail": "/onepiececg/bccard/en/products/2026/10/20/qtYf5lF6ahUAAJfl/thumbnail_cardlist.webp?_=dae3849df2fc4020e875c3bf1ff48530",
+        "dspdate": "2026/10/23 15:04",
+        "categories": {
+          "code": "INFORMATION",
+          "name": "LATEST INFORMATION",
+          "subcategory": [
+            {
+              "code": "cards",
+              "name": "CARDS"
+            }
+          ]
+        },
+        "updated": 1792738252,
+        "_id": "17953",
+        "publish_status": "publish",
+        "onepiece": {
+          "lead_paragraph": null,
+          "related_item": {
+            "asia-en": [],
+            "en": [
+              {
+                "same_tab": "1",
+                "thumbnail": null,
+                "thumbnail_alt": null,
+                "title": "",
+                "type": "link",
+                "url": "https://en.onepiece-cardgame.com/cardlist/?series=569205"
+              }
+            ],
+            "fr": [],
+            "jp": [],
+            "tc": [],
+            "th": []
+          },
+          "related_site": null,
+          "sub_title": null,
+          "thumbnail": "/onepiececg/bccard/en/products/2026/10/20/qtYf5lF6ahUAAJfl/thumbnail_cardlist.webp",
+          "thumbnail_alt": null
+        },
+        "site": "en",
+        "url": "https://en.onepiece-cardgame.com/information/02_544.html"
+      },
+      {
+        "onepiece": {
+          "lead_paragraph": null,
+          "related_item": {
+            "asia-en": [],
+            "en": [
+              {
+                "_id": "17802",
+                "category": "HISTORY",
+                "path": "/events/store-tournament-op18",
+                "subcategory": null,
+                "title": "4th Anniversary Event (OP-18 Release Event)",
+                "type": "article",
+                "url": "/events/store-tournament-op18"
+              }
+            ],
+            "fr": [],
+            "jp": [],
+            "tc": [],
+            "th": []
+          },
+          "related_site": null,
+          "sub_title": null,
+          "thumbnail": "/onepiececg/bccard/en/news/2026/10/20/J3XUH0VzVJBNQykM/thumbnail.webp",
+          "thumbnail_alt": null
+        },
+        "_id": "17954",
+        "updated": 1792735731,
+        "publish_status": "publish",
+        "categories": {
+          "code": "INFORMATION",
+          "name": "LATEST INFORMATION",
+          "subcategory": [
+            {
+              "code": "events",
+              "name": "EVENTS"
+            }
+          ]
+        },
+        "dspdate": "2026/10/23 15:03",
+        "title": "4th Anniversary Event (OP-18 Release Event) has been announced.",
+        "site": "en",
+        "thumbnail": "/onepiececg/bccard/en/news/2026/10/20/J3XUH0VzVJBNQykM/thumbnail.webp?_=dae3849df2fc4020e875c3bf1ff48530",
+        "url": "https://en.onepiece-cardgame.com/information/02_545.html"
+      },
+      {
+        "categories": {
+          "code": "INFORMATION",
+          "name": "LATEST INFORMATION",
+          "subcategory": [
+            {
+              "code": "products",
+              "name": "PRODUCTS"
+            }
+          ]
+        },
+        "dspdate": "2026/10/23 15:02",
+        "title": "Double Pack Set Vol.13 [DP-13] has been announced.",
+        "thumbnail": "/onepiececg/bccard/en/products/2026/10/22/Q78onZSxnwOKwHwk/thumbnail.webp?_=dae3849df2fc4020e875c3bf1ff48530",
+        "updated": 1792735731,
+        "onepiece": {
+          "lead_paragraph": null,
+          "related_item": {
+            "asia-en": [],
+            "en": [
+              {
+                "_id": "17940",
+                "category": "HISTORY",
+                "path": "/products/dp13",
+                "subcategory": null,
+                "title": "Double Pack Set Vol.13 [DP-13]",
+                "type": "article",
+                "url": "/products/dp13"
+              }
+            ],
+            "fr": [],
+            "jp": [],
+            "tc": [],
+            "th": []
+          },
+          "related_site": null,
+          "sub_title": null,
+          "thumbnail": "/onepiececg/bccard/en/products/2026/10/22/Q78onZSxnwOKwHwk/thumbnail.webp",
+          "thumbnail_alt": null
+        },
+        "_id": "17955",
+        "publish_status": "publish",
+        "site": "en",
+        "url": "https://en.onepiece-cardgame.com/information/02_546.html"
+      },
+      {
+        "updated": 1792735732,
+        "categories": {
+          "code": "INFORMATION",
+          "name": "LATEST INFORMATION",
+          "subcategory": [
+            {
+              "code": "products",
+              "name": "PRODUCTS"
+            }
+          ]
+        },
+        "title": "OFFICIAL CARD SLEEVES 17 has been announced.",
+        "_id": "17948",
+        "onepiece": {
+          "lead_paragraph": null,
+          "related_item": {
+            "asia-en": [],
+            "en": [
+              {
+                "_id": "17857",
+                "category": "HISTORY",
+                "path": "/products/sleeve047",
+                "subcategory": null,
+                "title": "OFFICIAL CARD SLEEVES 17",
+                "type": "article",
+                "url": "/products/sleeve047"
+              }
+            ],
+            "fr": [],
+            "jp": [],
+            "tc": [],
+            "th": []
+          },
+          "related_site": null,
+          "sub_title": null,
+          "thumbnail": "/onepiececg/bccard/jp/products/2026/10/20/YHynBlUfriLCleWs/thumbnail.webp",
+          "thumbnail_alt": null
+        },
+        "thumbnail": "/onepiececg/bccard/jp/products/2026/10/20/YHynBlUfriLCleWs/thumbnail.webp?_=dae3849df2fc4020e875c3bf1ff48530",
+        "dspdate": "2026/10/23 15:01",
+        "publish_status": "publish",
+        "site": "en",
+        "url": "https://en.onepiece-cardgame.com/information/01_566.html"
+      },
+      {
+        "updated": 1792738251,
+        "categories": {
+          "code": "INFORMATION",
+          "name": "LATEST INFORMATION",
+          "subcategory": [
+            {
+              "code": "news",
+              "name": "NEWS"
+            }
+          ]
+        },
+        "_id": "17981",
+        "dspdate": "2026/10/23 15:00",
+        "thumbnail": "/onepiececg/bccard/en/news/2026/10/20/VJcs3UR7GMX4h38F/thumbnail_eratta.webp?_=dae3849df2fc4020e875c3bf1ff48530",
+        "publish_status": "publish",
+        "onepiece": {
+          "lead_paragraph": null,
+          "related_item": {
+            "asia-en": [],
+            "en": [
+              {
+                "_id": "17848",
+                "category": "HISTORY",
+                "path": "/news/notice_eb05",
+                "subcategory": null,
+                "title": "Apology for the errata and revision in card effect text of EXTRA BOOSTER -ONE PI...",
+                "type": "article",
+                "url": "/news/notice_eb05"
+              }
+            ],
+            "fr": [],
+            "jp": [],
+            "tc": [],
+            "th": []
+          },
+          "related_site": null,
+          "sub_title": null,
+          "thumbnail": "/onepiececg/bccard/en/news/2026/10/20/VJcs3UR7GMX4h38F/thumbnail_eratta.webp",
+          "thumbnail_alt": null
+        },
+        "site": "en",
+        "title": "Apology for the errata and revision in card effect text of EXTRA BOOSTER -ONE PIECE HEROINES EDITION vol.2- [EB-05]",
+        "url": "https://en.onepiece-cardgame.com/information/02_547.html"
+      }
+    ]
+  }
+}

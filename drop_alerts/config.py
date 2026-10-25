@@ -47,6 +47,7 @@ class Settings:
     retention_days: int = 90
     source_max_bytes: int = 2000000
     source_max_items: int = 100
+    enabled_tcgs: list[str] = field(default_factory=lambda: ["magic", "one_piece", "pokemon"])
     sources: dict = field(default_factory=lambda: {
         "secret_lair_eu": {"enabled": True}, "magic_news": {"enabled": True},
         "chaos_vault_eu": {"enabled": True}, "secret_lair_bluesky": {"enabled": True},
@@ -57,12 +58,31 @@ class Settings:
         "mtggoldfish": {"enabled": False, "interval_seconds": 900},
         "mtgdrops": {"enabled": False, "interval_seconds": 900},
         "scg_news": {"enabled": False, "interval_seconds": 1800},
+        "one_piece_products": {"enabled": True, "interval_seconds": 900},
+        "one_piece_news": {"enabled": True, "interval_seconds": 900},
+        "pokemon_tcg_news_es": {"enabled": True, "interval_seconds": 900},
+        "pokemon_press_es": {"enabled": True, "interval_seconds": 1800},
+        "pokemon_products_es": {"enabled": False, "interval_seconds": 1800},
+        "pokemon_products_us": {"enabled": False, "interval_seconds": 1800},
+        "pokemon_news_jp": {"enabled": False, "interval_seconds": 1800},
+        "local_tcg_events": {"enabled": True, "interval_seconds": 1800},
+        "mundicomics_events": {"enabled": True, "interval_seconds": 1800},
+        "gladius_events": {"enabled": True, "interval_seconds": 1800},
+        "local_tcg_events_madrid": {"enabled": False, "interval_seconds": 1800},
+        "nextdice_events": {"enabled": False, "interval_seconds": 1800},
+        "arte9_events": {"enabled": False, "interval_seconds": 3600},
+        "ludoteca_events": {"enabled": False, "interval_seconds": 3600},
+        "jupiter_guadalajara_events": {"enabled": False, "interval_seconds": 3600},
     })
     rules: list[dict] = field(default_factory=lambda: [
         {"id": "store", "sources": ["secret_lair_eu"]},
         {"id": "secret-lair-news", "sources": ["magic_news"], "keywords": ["secret lair", "chaos vault", "festival in a box", "secret gallery", "roadshow", "zeta set", "countdown kit"]},
         {"id": "official-special-announcements", "sources": ["chaos_vault_eu", "secret_lair_bluesky", "wpn_news", "magiccon_news", "weekly_mtg"]},
         {"id": "secondary-special-announcements", "sources": ["magicspoiler", "mtggoldfish", "mtgdrops", "scg_news"]},
+        {"id": "one-piece-announcements", "tcgs": ["one_piece"], "sources": ["one_piece_products", "one_piece_news"]},
+        {"id": "pokemon-announcements", "tcgs": ["pokemon"], "sources": ["pokemon_tcg_news_es", "pokemon_press_es", "pokemon_products_es", "pokemon_products_us", "pokemon_news_jp"]},
+        {"id": "local-tcg-tournaments", "tcgs": ["magic", "one_piece", "pokemon"], "kinds": ["event"],
+         "sources": ["local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events"]},
     ])
 
     @classmethod
@@ -70,7 +90,7 @@ class Settings:
         env = os.environ if env is None else env
         result = cls()
         for name in result.__dataclass_fields__:
-            if name in ("sources", "rules", "discord_webhook_url", "llm_api_key"):
+            if name in ("sources", "rules", "discord_webhook_url", "llm_api_key", "enabled_tcgs"):
                 continue
             key = name.upper()
             if key not in env:
@@ -91,14 +111,27 @@ class Settings:
         if env.get("CONFIG_PATH"):
             with open(env["CONFIG_PATH"], "rb") as stream:
                 config = tomllib.load(stream)
-            if set(config) - {"sources", "rules"}:
+            if set(config) - {"sources", "rules", "games"}:
                 raise ValueError("Sección de configuración desconocida")
             result.sources = config.get("sources", result.sources)
             result.rules = config.get("rules", result.rules)
+            games = config.get("games", {})
+            if not isinstance(games, dict) or set(games) - {"enabled"}:
+                raise ValueError("Opciones de juegos inválidas")
+            result.enabled_tcgs = games.get("enabled", result.enabled_tcgs)
+        if "ENABLED_TCGS" in env:
+            result.enabled_tcgs = [value.strip() for value in env["ENABLED_TCGS"].split(",") if value.strip()]
         result.validate()
         return result
 
     def validate(self) -> None:
+        from .profiles import normalize_tcg
+        if not isinstance(self.enabled_tcgs, list) or any(not isinstance(value, str) or not value.strip() for value in self.enabled_tcgs):
+            raise ValueError("Juegos habilitados inválidos")
+        import re
+        self.enabled_tcgs = list(dict.fromkeys(normalize_tcg(value) for value in self.enabled_tcgs))
+        if any(not re.fullmatch(r"[a-z][a-z0-9_]{0,49}", value) for value in self.enabled_tcgs):
+            raise ValueError("Identificador de TCG inválido")
         ZoneInfo(self.timezone)
         if self.bootstrap_mode not in ("silent", "notify"):
             raise ValueError("BOOTSTRAP_MODE debe ser silent o notify")

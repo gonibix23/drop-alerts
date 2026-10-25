@@ -1,5 +1,8 @@
 # Copiar y montar en /app/config.toml para personalizar las fuentes y reglas.
 # Los adaptadores y sus URLs oficiales se registran en el código.
+[games]
+enabled = ["magic", "one_piece", "pokemon"]
+
 [sources.secret_lair_eu]
 enabled = true
 
@@ -42,6 +45,71 @@ interval_seconds = 900
 enabled = false
 interval_seconds = 1800
 
+# One Piece: publicación oficial occidental, no prueba de stock en España.
+[sources.one_piece_products]
+enabled = true
+interval_seconds = 900
+
+[sources.one_piece_news]
+enabled = true
+interval_seconds = 900
+
+# Pokémon: noticias oficiales físicas y notas de prensa en español.
+[sources.pokemon_tcg_news_es]
+enabled = true
+interval_seconds = 900
+
+[sources.pokemon_press_es]
+enabled = true
+interval_seconds = 1800
+
+# Galerías con acceso intermitente; Japón y EE. UU. son mercados separados.
+[sources.pokemon_products_es]
+enabled = false
+interval_seconds = 1800
+
+[sources.pokemon_products_us]
+enabled = false
+interval_seconds = 1800
+
+[sources.pokemon_news_jp]
+enabled = false
+interval_seconds = 1800
+
+# Torneos cercanos: calendarios públicos de tiendas del chat compartido.
+[sources.local_tcg_events]
+enabled = true
+interval_seconds = 1800
+
+[sources.mundicomics_events]
+enabled = true
+interval_seconds = 1800
+
+[sources.gladius_events]
+enabled = true
+interval_seconds = 1800
+
+# Ampliación opcional de agendas por Madrid y alrededores.
+[sources.local_tcg_events_madrid]
+enabled = false
+interval_seconds = 1800
+
+[sources.nextdice_events]
+enabled = false
+interval_seconds = 1800
+
+[sources.arte9_events]
+enabled = false
+interval_seconds = 3600
+
+[sources.ludoteca_events]
+enabled = false
+interval_seconds = 3600
+
+[sources.jupiter_guadalajara_events]
+enabled = false
+interval_seconds = 3600
+
 # Los filtros de una regla se combinan con AND; valores dentro de un filtro, OR.
 # Una lista vacía no restringe ese campo. Al menos una regla debe coincidir.
 [[rules]]
@@ -70,4 +138,25 @@ require_analysis = false
 [[rules]]
 id = "secondary-special-announcements"
 sources = ["magicspoiler", "mtggoldfish", "mtgdrops", "scg_news"]
+require_analysis = false
+
+[[rules]]
+id = "one-piece-announcements"
+tcgs = ["one_piece"]
+sources = ["one_piece_products", "one_piece_news"]
+require_analysis = false
+
+[[rules]]
+id = "pokemon-announcements"
+tcgs = ["pokemon"]
+sources = ["pokemon_tcg_news_es", "pokemon_press_es", "pokemon_products_es", "pokemon_products_us", "pokemon_news_jp"]
+require_analysis = false
+
+[[rules]]
+id = "local-tcg-tournaments"
+tcgs = ["magic", "one_piece", "pokemon"]
+kinds = ["event"]
+sources = ["local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events"]
+# Opcional: cities = ["Alcalá de Henares", "Torrejón de Ardoz"]
+# Opcional: regions = ["EU"]
 require_analysis = false

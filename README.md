@@ -1,12 +1,12 @@
 # Drop Alerts
 
-Servicio de alertas con adaptadores independientes, estado en SQLite, cola persistente y notificaciones por webhook de Discord. Vigila Secret Lair EU, Chaos Vault, anuncios de Magic, Bluesky oficial de Secret Lair, WPN, MagicCon y WeeklyMTG. El modelo remoto interpreta contenido ambiguo; el código conserva la autoridad sobre consultas, precios, disponibilidad, reglas, deduplicación y envíos.
+Servicio de alertas para **Magic: The Gathering, One Piece Card Game y Pokémon TCG**, con adaptadores independientes, estado en SQLite, cola persistente y notificaciones por webhook de Discord. Vigila anuncios, productos y promociones oficiales, además de calendarios de torneos de tiendas de Madrid y alrededores. Conserva la integración de Secret Lair y Chaos Vault. El modelo remoto interpreta contenido ambiguo; el código conserva la autoridad sobre consultas, fechas, precios, disponibilidad, reglas, deduplicación y envíos.
 
 El contenedor usa Python 3.12 slim, un único servicio y un volumen. No publica puertos y no incluye ningún modelo, navegador ni servidor de inferencia.
 
 El estado de esta entrega y las comprobaciones realizadas están en [verificación](docs/verification.md). Si recibes el proyecto como ZIP, extráelo como `drop-alerts` y entra en esa carpeta en lugar de ejecutar `git clone`.
 
-Consulta las [fuentes implementadas y sus intervalos](docs/announcement-sources.md). La [investigación ampliada](docs/source-expansion-research.md) conserva la revisión original y otros candidatos; que una fuente aparezca investigada no significa que esté activada.
+Consulta la [cobertura actual, fuentes y configuración por juego](docs/multi-tcg.md). La [guía de anuncios de Magic](docs/announcement-sources.md) y la [investigación ampliada](docs/source-expansion-research.md) conservan el detalle de la integración original; que una fuente aparezca investigada no significa que esté activada.
 
 ## Arranque con Docker
 
@@ -27,19 +27,41 @@ La primera comprobación correcta de cada fuente establece una referencia silenc
 
 Para Portainer, usa el repositorio `https://github.com/gonibix23/drop-alerts.git`, configura `DISCORD_WEBHOOK_URL` en las variables del stack y despliega. El modo Repository obtiene el Dockerfile y el código necesarios para construir; pegar solamente el YAML en Web editor no aporta esos archivos. La variable antigua `DROP_ALERTS_IMAGE` ya no se utiliza en el Compose predeterminado y puedes eliminarla. La imagen privada de GHCR se conserva como alternativa opcional; el procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
 
-Para actualizar un stack existente en Portainer, abre el stack creado desde Repository y utiliza **Pull and redeploy** para obtener `main` y reconstruir con `docker-compose.yml`. Conserva el volumen `drop_alerts_data`: al arrancar se aplica automáticamente la migración aditiva de SQLite de esquema 1 a 2, sin borrar estados, colas ni entregas. Mantén `BOOTSTRAP_MODE=silent`; las fuentes nuevas y los inventarios ampliados de Magic se incorporan sin avisos históricos. Si montas un TOML antiguo, incorpora los nuevos bloques de fuentes y reglas desde el ejemplo: ese archivo sustituye las listas predeterminadas.
+Para actualizar un stack existente en Portainer, abre el stack creado desde Repository y utiliza **Pull and redeploy** para obtener `main`, con reconstrucción de la imagen desde `docker-compose.yml`. Conserva el volumen `drop_alerts_data`: la ampliación a varios TCG mantiene el esquema SQLite 2 y las identidades anteriores de Magic. Mantén `BOOTSTRAP_MODE=silent`; cada fuente nueva establece su referencia sin avisos históricos. Si montas un TOML antiguo, incorpora los nuevos bloques de fuentes y reglas desde el ejemplo: ese archivo sustituye las listas predeterminadas, y una fuente ausente no se activa automáticamente.
 
-## Anuncios y Discord
+## Fuentes y Discord
 
-Hay siete fuentes oficiales activadas por defecto. Secret Lair EU, Chaos Vault, Magic y Bluesky siguen `POLL_INTERVAL_SECONDS` (300 segundos inicialmente); WPN y WeeklyMTG se revisan cada 15 minutos y MagicCon cada 30. Magic amplía la portada con la categoría de anuncios, el sitemap y revisiones de artículos guardados. Los medios MagicSpoiler, MTGGoldfish, MTGDrops y Star City Games están disponibles como fuentes opcionales, desactivadas inicialmente.
+Hay **14 fuentes activadas por defecto y 26 adaptadores registrados**. Los intervalos concretos y las fuentes opcionales figuran en [la guía multijuego](docs/multi-tcg.md).
 
-Las notificaciones usan tarjetas con color e icono según el evento, título enlazado, extracto de la fuente, región, fecha y una imagen cuando el adaptador la ha extraído de la fuente. Los precios y la disponibilidad se muestran cuando hay datos admitidos por el programa; un anuncio no prueba que un producto ya esté a la venta. El texto conserva el idioma de la fuente y las etiquetas están en español. Las menciones siguen desactivadas.
+| Cobertura activa | Fuentes |
+| --- | --- |
+| Magic · 7 | Secret Lair EU, Chaos Vault EU, noticias de Magic, Bluesky oficial de Secret Lair, WPN, MagicCon y WeeklyMTG |
+| One Piece · 2 | Catálogo oficial occidental y anuncios/promociones oficiales de Bandai |
+| Pokémon · 2 | Noticias del portal oficial del JCC y prensa oficial en español |
+| Torneos locales · 3 | Donde Jugar TCG para seis tiendas cercanas, Mundicomics y Gladius Games |
 
-Puedes abrir la [vista previa HTML](docs/discord-preview.html) en tu navegador o consultar el [JSON de ejemplo](docs/examples/discord-announcement.json). Ambos usan datos ficticios y no envían mensajes.
+Las tres fuentes locales cubren inicialmente **ocho tiendas**. El [inventario de las 25 tiendas del chat compartido](docs/local-stores-coverage.json) distingue los calendarios comprobados de los perfiles activados. Madrid, Algete y Guadalajara tienen ampliaciones opcionales; las redes sociales de las tiendas no se rastrean.
 
-El servicio intenta obtener la **fecha prevista de venta, preventa o lanzamiento** a partir del anuncio y mostrarla separada de cuándo fue detectado. Convierte la hora a la zona configurada —Madrid por defecto— solo cuando la fuente especifica una zona horaria, marca las fechas orientativas y avisa de los cambios de fecha. Si no hay datos suficientes, muestra «Sin fecha confirmada». Consulta [cómo se extraen y validan las fechas](docs/release-dates.md).
+Las tarjetas de Discord muestran juego, región, idioma de la fuente, canal, tipo de evento, título enlazado y una imagen cuando procede de la fuente. Los anuncios de One Piece para Occidente incluyen Europa, pero un MSRP en dólares no se presenta como precio europeo. Las noticias de Pokémon en español tienen alcance global: el idioma no demuestra stock en España. Los mercados de Japón y Estados Unidos permanecen separados. Un anuncio no prueba que un producto ya esté a la venta. Las menciones están desactivadas.
+
+Puedes abrir la [vista previa multijuego](docs/multi-tcg-preview.html) o consultar su [JSON de ejemplo](docs/examples/multi-tcg-discord.json). Los ejemplos son ficticios y no envían mensajes.
+
+El servicio intenta obtener la **fecha prevista de venta, preventa o lanzamiento** a partir del anuncio y mostrarla separada de cuándo fue detectado. Convierte la hora a la zona configurada —Madrid por defecto— solo cuando hay una zona horaria respaldada por la fuente, marca las fechas orientativas y avisa de los cambios de fecha. Si no hay datos suficientes, muestra «Sin fecha confirmada». Los torneos muestran su horario, tienda y tarifa de inscripción por separado; un período de evento no se convierte en fecha de venta. Consulta [cómo se extraen y validan las fechas](docs/release-dates.md) y [los límites de los calendarios](docs/multi-tcg.md#torneos-y-tiendas-locales).
 
 La deduplicación entre fuentes reconoce publicaciones que enlazan el mismo artículo oficial. No fusiona automáticamente campañas por títulos parecidos: dos anuncios diferentes, una revelación y un producto de tienda pueden generar eventos distintos. La [guía de fuentes](docs/announcement-sources.md) explica esa cobertura y sus límites.
+
+## Consultar alertas y probar mensajes
+
+En **Portainer → Containers → Drop Alerts → Console**, abre `/bin/sh` y ejecuta:
+
+```sh
+python -m drop_alerts events --tcg one_piece --kind event --limit 10
+python -m drop_alerts events --tcg pokemon --kind article --limit 10
+python -m drop_alerts preview --tcg one_piece --kind event
+python -m drop_alerts preview --tcg pokemon --kind article --send
+```
+
+`events` consulta eventos guardados; `preview` muestra el último mensaje que coincide. Solo `--send` envía una vista previa al webhook configurado, con la marca **VISTA PREVIA MANUAL**. No vuelve a consultar las webs, no llama al modelo ni cambia el historial o la deduplicación. También permite probar eventos registrados durante el arranque silencioso. Desde el host, antepón `docker compose exec drop-alerts`. La [guía de consultas y pruebas](docs/inspecting-alerts.md) explica los filtros y los errores de envío.
 
 ## Modelo remoto
 
@@ -69,18 +91,23 @@ Si el servidor exige autenticación, define `LLM_API_KEY` mediante variables pro
 
 ## Configuración
 
-[.env.example](.env.example) reúne las opciones. Las variables se validan al arrancar. Para personalizar fuentes y reglas, copia [config.example.toml](config.example.toml), edítalo, móntalo en `/app/config.toml` y configura `CONFIG_PATH=/app/config.toml`. Cada fuente admite `interval_seconds`; si lo omites, utiliza `POLL_INTERVAL_SECONDS`. Las reglas filtran por fuente, categoría, tipo de evento y palabras clave. Las palabras clave se comprueban sin distinguir mayúsculas. Revisa [cómo ampliar el sistema](docs/extending.md).
+[.env.example](.env.example) reúne las opciones. Las variables se validan al arrancar. Para personalizar fuentes y reglas, copia [config.example.toml](config.example.toml), edítalo, móntalo en `/app/config.toml` y configura `CONFIG_PATH=/app/config.toml`. Cada fuente admite `interval_seconds`; si lo omites, utiliza `POLL_INTERVAL_SECONDS`.
+
+Selecciona los juegos con `[games].enabled` en el TOML o con `ENABLED_TCGS=magic,one_piece,pokemon` en las variables del stack; la variable, cuando está definida, tiene prioridad. Las reglas admiten `tcgs`, `regions`, `cities` y `channels`, además de fuente, categoría, tipo de evento, estado y palabras clave. Los juegos y filtros geográficos se normalizan; las palabras clave ignoran mayúsculas. Dentro de una regla se deben cumplir todos los filtros, y basta con que coincida una regla para permitir la alerta. Consulta [ejemplos de configuración](docs/multi-tcg.md#seleccionar-juegos-y-reglas) y [cómo ampliar el sistema](docs/extending.md).
 
 | Grupo | Opciones principales |
 | --- | --- |
 | Servicio | `POLL_INTERVAL_SECONDS=300`, `TIMEZONE=Europe/Madrid`, `BOOTSTRAP_MODE=silent`, `LOG_LEVEL=INFO` |
+| Juegos | `ENABLED_TCGS=magic,one_piece,pokemon` o `[games].enabled` en TOML |
 | Persistencia | `DATABASE_PATH=/data/drop-alerts.db`, `HEARTBEAT_PATH=/data/heartbeat.json`, `RETENTION_DAYS=90` |
 | Fuentes | `HTTP_TIMEOUT_SECONDS=20`, `HTTP_MAX_RETRIES=1`, `SOURCE_MAX_BYTES=2000000`, `SOURCE_MAX_ITEMS=100` |
 | IA | `LLM_ENABLED`, `LLM_BASE_URL`, `LLM_MODEL`, `LLM_API_KEY`/`LLM_API_KEY_FILE`, tiempo de espera, reintentos, temperatura, límites de entrada/salida y caché |
 | Cola IA | `MAX_PENDING_ANALYSES=100`, `ANALYSES_PER_TICK=4`, `ANALYSIS_MAX_ATTEMPTS=3` |
 | Discord | `DISCORD_WEBHOOK_URL`/`DISCORD_WEBHOOK_URL_FILE`, `NOTIFICATION_MAX_ATTEMPTS=12`, `NOTIFICATION_BATCH_SIZE=10` |
 
-La zona horaria controla la presentación de fechas. Los instantes persistidos emplean UTC. No configures varias réplicas contra la misma base de datos: este despliegue está pensado para una instancia.
+La zona horaria controla la presentación de fechas. Las fechas de detección emplean UTC; los horarios de torneos conservan también la información temporal de la fuente. No configures varias réplicas contra la misma base de datos: este despliegue está pensado para una instancia.
+
+Al desactivar un juego, fuente o regla, las notificaciones pendientes que dejan de cumplir la configuración se marcan como omitidas (`skipped`). Rehabilitarlo no rescata esa cola antigua; los cambios nuevos que cumplan las reglas pueden generar alertas.
 
 ## Flujo de trabajo
 
@@ -105,7 +132,9 @@ python -m pip install -e '.[dev]'
 python -m pytest
 ```
 
-Las pruebas usan respuestas guardadas y transportes HTTP simulados: no requieren el modelo real ni envían mensajes a Discord. La integración continua prueba Python 3.12 y 3.14 y prepara imágenes Linux amd64 y arm64. La publicación en GHCR se hace desde `main` después de superar las pruebas; las solicitudes de cambios no publican imágenes. Consulta el resultado de la ejecución concreta en GitHub Actions.
+Las pruebas usan respuestas guardadas y transportes HTTP simulados: no requieren el modelo real ni envían mensajes a Discord. La comprobación de esta ampliación del 25 de octubre de 2026 superó **662 pruebas** y consultó las 14 fuentes activas con TLS verificado, sin errores parciales y sin generar notificaciones durante el arranque silencioso; IA y Discord estaban desactivados en esa comprobación. El detalle y las limitaciones de construcción y despliegue están en [verificación](docs/verification.md).
+
+La integración continua prueba Python 3.12 y 3.14 y prepara imágenes Linux amd64 y arm64. La publicación en GHCR se hace desde `main` después de superar las pruebas; las solicitudes de cambios no publican imágenes. Consulta el resultado de la ejecución concreta en GitHub Actions.
 
 Para ejecutar fuera de Docker, configura rutas escribibles locales en `DATABASE_PATH` y `HEARTBEAT_PATH`, y exporta las variables en tu terminal. El archivo `.env` se utiliza para interpolación de Docker Compose; no se carga automáticamente al ejecutar Python directamente.
 
