@@ -58,6 +58,7 @@ SOURCE_LABELS = {
     "jupiter_guadalajara_events": "Júpiter Guadalajara · Eventos",
     "tabletop_gamers": "Tabletop Gamers · Tienda online",
     "jjcollection": "JJ Collection · Tienda online",
+    "animefan": "Animefan · Tienda online",
 }
 TCG_COLORS = {"one_piece": 0xE75B56, "pokemon": 0xF2C94C}
 REGION_LABELS = {"EU": "Europa", "ES": "España", "US": "Estados Unidos", "NA": "Norteamérica",
@@ -331,6 +332,11 @@ def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
     fields = []
     if tcg and tcg != "unknown":
         fields.append({"name": "🃏 Juego", "value": _discord_text(TCG_LABELS.get(tcg, tcg), 200), "inline": True})
+    if data.get("domain") == "collectibles":
+        labels = {"figure": "Figura", "merchandise": "Merchandising", "collectible": "Coleccionable"}
+        fields.append({"name": "🗂️ Tipo de producto", "value": labels.get(str(data.get("product_category")), "Coleccionable"), "inline": True})
+        if isinstance(data.get("franchise"), str) and data["franchise"].strip():
+            fields.append({"name": "🎬 Franquicia", "value": _discord_text(data["franchise"], 200), "inline": True})
     fields.append({"name": "📡 Fuente", "value": _discord_text(SOURCE_LABELS.get(event.source, event.source), 200), "inline": True})
     region = profile.get("region")
     if region:
@@ -463,7 +469,7 @@ class NotificationWorker:
         self.settings, self.store, self.channel = settings, store, channel
 
     def _configuration_allows(self, event: Event, rules) -> bool:
-        from .profiles import SOURCE_PROFILES, event_profile, normalize_tcg
+        from .profiles import SOURCE_PROFILES, event_profile, normalize_tcg, source_scope_enabled
 
         cfg = self.settings.sources.get(event.source)
         if cfg is None:
@@ -472,6 +478,8 @@ class NotificationWorker:
             if event.source in SOURCE_PROFILES:
                 return False
         elif not isinstance(cfg, dict) or not cfg.get("enabled", True):
+            return False
+        if not source_scope_enabled(event.source, event.data["current"], cfg):
             return False
         game = event_profile(event.data["current"], event.source).get("tcg")
         if game is not None and game not in {normalize_tcg(value) for value in self.settings.enabled_tcgs}:

@@ -10,7 +10,7 @@ from pathlib import Path
 from .models import Event, FetchResult, Item, canonical_json, fingerprint, utcnow
 from .identities import announcement_url, event_reference_url
 from .schedule_enrichment import enrich_item, should_analyze_schedule, source_text
-from .profiles import enrich_game, game_enabled, event_profile
+from .profiles import enrich_game, game_enabled, event_profile, source_scope_enabled
 
 
 class Store:
@@ -178,7 +178,9 @@ class Store:
                         duplicate = existing is not None and existing[0] != event.id
                         if not existing:
                             self.db.execute("INSERT INTO announcement_claims VALUES(?,?,?)", (identity, event.id, time.time()))
-                    if not silent and not historical and decision.notify and not duplicate and game_enabled(asdict(current), settings.enabled_tcgs):
+                    if (not silent and not historical and decision.notify and not duplicate
+                            and game_enabled(asdict(current), settings.enabled_tcgs)
+                            and source_scope_enabled(source, asdict(current), settings.sources.get(source))):
                         status = "waiting_analysis" if decision.require_analysis else "pending"
                         self.db.execute("INSERT OR IGNORE INTO outbox(event_id,status) VALUES(?,?)", (event.id, status))
                         task = "change" if previous and event.event_type in ("content.changed", "change.uncertain") else "classification"

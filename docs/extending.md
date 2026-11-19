@@ -31,6 +31,8 @@ Añade pruebas con respuestas guardadas: estructura válida, vacía, parcialment
 
 Parte de [config.example.toml](../config.example.toml), que incluye todas las fuentes implementadas y sus reglas. Cada bloque `[sources.<id>]` admite `enabled` e `interval_seconds` entre 30 y 86.400 segundos. Si no declaras intervalo, se aplica `POLL_INTERVAL_SECONDS`. El planificador guarda la próxima comprobación por fuente para respetar esos intervalos tras reinicios; una ejecución `once` fuerza una revisión de las fuentes activadas.
 
+Como opción específica, `[sources.animefan]` admite `include_collectibles` booleano, desactivado inicialmente. Amplía el seguimiento a figuras sin identificarlas como juegos TCG. Las opciones adicionales se validan por adaptador; escribir esa opción en otra fuente se rechaza. Al añadir ámbitos opcionales, aplica su selección tanto al descubrimiento como a la ingestión, las notificaciones pendientes y las consultas manuales.
+
 Los apartados `sources` y `rules` de un TOML personalizado sustituyen los valores predeterminados de esos apartados. Si actualizas desde un archivo antiguo con solo dos fuentes, incorpora los nuevos bloques y reglas; actualizar la imagen no los añade a ese archivo. Para activar un medio opcional, cambia su `enabled=false` por `true` y conserva una regla que incluya su ID. Monta el archivo y configura `CONFIG_PATH` para que se lea. La [guía de anuncios](announcement-sources.md) detalla los valores iniciales y las fuentes no implementadas.
 
 ## Reglas

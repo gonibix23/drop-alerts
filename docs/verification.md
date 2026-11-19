@@ -2,6 +2,17 @@
 
 El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts). Las comprobaciones se detallan por versión y fecha.
 
+## Actualización 1.4.1: Animefan, solo TCG (19/11/2026)
+
+- `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-animefan-final`: **784 pruebas aprobadas**, Python 3.14 en Windows. Se completaron también `compileall`, `pip check` y la validación del Compose sin errores.
+- La consulta real de `animefan`, con `SourceHTTP`, HTTPS/TLS verificado y SQLite en memoria, extrajo **12 productos Pokémon de cuatro páginas**, sin errores parciales. El arranque silencioso dejó **0 notificaciones pendientes** y repetir los resultados produjo **0 eventos nuevos**. No se consultó el modelo ni se envió nada a Discord.
+- Se comprobaron las categorías públicas de cartas y sus fichas WooCommerce/Elementor. Las pruebas reproducen productos TCG y accesorios, productos agotados, reservas, compra bajo pedido, recomendaciones anidadas, depósito frente a precio total, importes contradictorios y errores HTTP. La categoría genérica de cartas coleccionables no basta para afirmar que un artículo sea TCG: se exige evidencia propia del producto o fabricante y se excluyen naipes y figuras en el modo inicial.
+- La configuración entregada mantiene `include_collectibles=false`, conforme a la preferencia de **solo cartas TCG**. También se verificó la opción independiente desactivada de coleccionables, incluido el cierre de mensajes pendientes y su exclusión de las vistas previas al desactivarla.
+- Se mantienen SQLite 2, dependencias y volumen, sin puertos ni servicios adicionales. Hay **17 fuentes activas y 29 registradas**. Las capturas completas están en `work/research/animefan/`, fuera de Git; se incluyen extractos reducidos en las pruebas. La prueba en vivo es una ventana acotada, no el catálogo completo.
+- El motor Docker local no está disponible. La construcción y ejecución del contenedor de cada revisión se consultan en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions). No se ha accedido al stack de Portainer; la conectividad y entrega real deben comprobarse en ese entorno.
+
+Consulta [la configuración de Animefan](animefan.md) y [el estudio de la fuente](research-animefan.md). Las verificaciones siguientes son históricas.
+
 ## Actualización 1.4: tiendas online (19/11/2026)
 
 - `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-retail-final`: **739 pruebas aprobadas**, Python 3.14 en Windows. Compilación de módulos con `compileall` y revisión de formato completadas correctamente.

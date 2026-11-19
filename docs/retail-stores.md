@@ -1,6 +1,8 @@
-# Productos de Tabletop Gamers y JJ Collection
+# Tiendas online: productos de cartas y coleccionables
 
 Desde la versión 1.4, `tabletop_gamers` y `jjcollection` se activan por defecto y se consultan cada **300 segundos**. Generan avisos por productos nuevos, cambios explícitos de disponibilidad, reposiciones, precios y cambios de fecha detectables. La detección, SQLite, las reglas y la cola de Discord siguen siendo deterministas; no hace falta una inferencia para confirmar un stock o un precio.
+
+La versión 1.4.1 añade también `animefan`, con el mismo intervalo y seguimiento de cartas por defecto. Sus figuras y coleccionables tienen una opción de activación independiente; consulta [la guía de Animefan](animefan.md).
 
 ## Qué se consulta
 
@@ -8,6 +10,7 @@ Desde la versión 1.4, `tabletop_gamers` y `jjcollection` se activan por defecto
 | --- | --- | --- |
 | [Tabletop Gamers](https://tabletopgamers.es/) | Catálogos HTML de WooCommerce, paginación pública y fichas con Product JSON-LD contrastado con información visible | Productos y accesorios de cartas, novedades y reservas. Revisión rotatoria de fichas conocidas. |
 | [JJ Collection](https://www.jjcollection.es/) | Sitemaps públicos y fichas HTML de Shopify, con ofertas JSON-LD y metadatos de cada variante | Productos, cartas y accesorios TCG; cada variante mantiene precio y disponibilidad propios. |
+| [Animefan](https://animefan.es/) | Categorías públicas y fichas de WooCommerce contrastadas con sus metadatos | Cartas y productos TCG; figuras y coleccionables solo si se activa su opción. |
 
 Los métodos y respuestas reales comprobados el **19 de noviembre de 2026** están en los estudios de [Tabletop](research-tabletop.md) y [JJ Collection](research-jjcollection.md). No se usan cuentas, APIs privadas, carrito, navegadores ni acciones de compra. Las rutas restringidas en los robots examinados se evitan.
 
@@ -34,7 +37,7 @@ Se mantienen los juegos seleccionados por `ENABLED_TCGS` o `[games].enabled`. Co
 ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,digimon,yugioh,star_wars_unlimited,cyberpunk
 ```
 
-Las etiquetas adicionales permiten filtrar productos de las tiendas; no crean adaptadores de anuncios oficiales de esos juegos. La clasificación usa título y categorías del producto, nunca los menús generales de la web. Los accesorios generales para cartas pueden no tener un juego asignado y se permiten mediante la regla de tiendas. Las tarjetas regalo, figuras sueltas y entradas de torneo quedan fuera del seguimiento comercial.
+Las etiquetas adicionales permiten filtrar productos de las tiendas; no crean adaptadores de anuncios oficiales de esos juegos. La clasificación usa título y categorías del producto, nunca los menús generales de la web. Los accesorios generales para cartas pueden no tener un juego asignado y se permiten mediante la regla de tiendas. Las tarjetas regalo y entradas de torneo quedan fuera del seguimiento comercial. Tabletop y JJ Collection excluyen figuras sueltas; Animefan permite activarlas con `include_collectibles=true`, sin etiquetarlas como TCG ni vincularlas a `ENABLED_TCGS`.
 
 Para limitar aún más, adapta `retail-card-drops` con `tcgs`, `keywords`, `states` o `event_types`. Una regla adicional no restringe otra regla más amplia que siga activada. Por ejemplo, para recibir solo novedades y entradas en stock, modifica la regla existente:
 
@@ -82,6 +85,7 @@ python -m drop_alerts events --source tabletop_gamers --kind product --limit 10
 python -m drop_alerts events --source jjcollection --tcg pokemon --limit 10
 python -m drop_alerts preview --source tabletop_gamers --kind product
 python -m drop_alerts preview --source jjcollection --kind product
+python -m drop_alerts preview --source animefan --kind product
 ```
 
 `preview` imprime el mensaje. Añade `--send` para enviarlo expresamente al webhook configurado, con la marca de vista previa manual. No modifica la deduplicación ni la cola. La consulta incluye los eventos conservados del arranque silencioso y respeta los juegos, fuentes y reglas actuales. Espera a la primera comprobación correcta si todavía no hay resultados. Véase [la guía de inspección](inspecting-alerts.md).

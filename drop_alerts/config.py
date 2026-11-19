@@ -75,6 +75,7 @@ class Settings:
         "jupiter_guadalajara_events": {"enabled": False, "interval_seconds": 3600},
         "tabletop_gamers": {"enabled": True, "interval_seconds": 300},
         "jjcollection": {"enabled": True, "interval_seconds": 300},
+        "animefan": {"enabled": True, "interval_seconds": 300, "include_collectibles": False},
     })
     rules: list[dict] = field(default_factory=lambda: [
         {"id": "store", "sources": ["secret_lair_eu"]},
@@ -86,6 +87,8 @@ class Settings:
         {"id": "local-tcg-tournaments", "tcgs": ["magic", "one_piece", "pokemon"], "kinds": ["event"],
          "sources": ["local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events"]},
         {"id": "retail-card-drops", "sources": ["tabletop_gamers", "jjcollection"], "kinds": ["product", "collection"],
+         "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
+        {"id": "animefan-drops", "sources": ["animefan"], "kinds": ["product", "collection"],
          "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
     ])
 
@@ -169,9 +172,12 @@ class Settings:
         from .registry import SOURCE_FACTORIES
         if set(self.sources) - SOURCE_FACTORIES.keys():
             raise ValueError("Adaptador sin registrar; añade el módulo en registry.py")
-        for cfg in self.sources.values():
-            if not isinstance(cfg, dict) or set(cfg) - {"enabled", "interval_seconds"} or not isinstance(cfg.get("enabled", True), bool):
+        for source_id, cfg in self.sources.items():
+            allowed = {"enabled", "interval_seconds"} | ({"include_collectibles"} if source_id == "animefan" else set())
+            if not isinstance(cfg, dict) or set(cfg) - allowed or not isinstance(cfg.get("enabled", True), bool):
                 raise ValueError("Opciones de fuente inválidas")
+            if "include_collectibles" in cfg and type(cfg["include_collectibles"]) is not bool:
+                raise ValueError("include_collectibles debe ser booleano")
             if "interval_seconds" in cfg and (type(cfg["interval_seconds"]) is not int or not 30 <= cfg["interval_seconds"] <= 86400):
                 raise ValueError("interval_seconds debe ser un entero entre 30 y 86400")
         from .rules import RuleEngine

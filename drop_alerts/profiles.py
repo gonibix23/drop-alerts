@@ -42,7 +42,7 @@ SOURCE_PROFILES = {
     "pokemon_products_us": {"tcg": "pokemon", "region": "US", "language": "en", "channel": "online"},
     "pokemon_news_jp": {"tcg": "pokemon", "region": "JP", "language": "ja", "channel": "news"},
     **{name: {"region": "EU", "country": "ES", "language": "es", "channel": "online"}
-       for name in ("tabletop_gamers", "jjcollection")},
+       for name in ("tabletop_gamers", "jjcollection", "animefan")},
     **{name: {"region": "EU", "language": "es", "channel": "event", "timezone": "Europe/Madrid", "tcgs": ["magic", "one_piece", "pokemon"]}
        for name in ("local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events")},
 }
@@ -81,6 +81,14 @@ def game_enabled(current: dict, enabled_tcgs: list[str]) -> bool:
     game = event_profile(current).get("tcg")
     # Preserve generic non-TCG domains; filtering only applies to game-tagged data.
     return game is None or game in enabled_tcgs
+
+
+def source_scope_enabled(source: str, current: dict, config: dict | None) -> bool:
+    """A retailer's optional non-card catalogue has an independent opt-in."""
+    data = current.get("data", {})
+    if source == "animefan" and isinstance(data, dict) and data.get("domain") == "collectibles":
+        return isinstance(config, dict) and config.get("include_collectibles") is True
+    return True
 
 
 def infer_event_tcg(value: str) -> str | None:

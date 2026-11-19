@@ -8,6 +8,7 @@ from .sources.pokemon import PokemonProductsSource, PokemonUSProductsSource, Pok
 from .sources.local_events import LocalTCGEventsSource, MundicomicsEventsSource, MADRID_STORES
 from .sources.tabletop import TabletopGamersSource
 from .sources.jjcollection import JJCollectionSource
+from .sources.animefan import AnimefanSource
 from .profiles import SOURCE_PROFILES
 
 
@@ -50,6 +51,8 @@ SOURCE_FACTORIES = {
     "jupiter_guadalajara_events": lambda settings, store: _jupiter_calendar(settings),
     "tabletop_gamers": lambda settings, store: TabletopGamersSource(max_items=min(12, settings.source_max_items)),
     "jjcollection": lambda settings, store: JJCollectionSource(max_items=min(12, settings.source_max_items)),
+    "animefan": lambda settings, store: AnimefanSource(max_items=min(12, settings.source_max_items),
+        include_collectibles=settings.sources["animefan"].get("include_collectibles", False)),
 }
 
 

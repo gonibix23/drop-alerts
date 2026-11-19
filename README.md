@@ -1,6 +1,6 @@
 # Drop Alerts
 
-Servicio de alertas para **Magic: The Gathering, One Piece Card Game y Pokémon TCG**, con adaptadores independientes, estado en SQLite, cola persistente y notificaciones por webhook de Discord. Vigila anuncios, productos y promociones oficiales, los productos de **Tabletop Gamers y JJ Collection**, y calendarios de torneos de tiendas de Madrid y alrededores. Conserva la integración de Secret Lair y Chaos Vault. El modelo remoto interpreta contenido ambiguo; el código conserva la autoridad sobre consultas, fechas, precios, disponibilidad, reglas, deduplicación y envíos.
+Servicio de alertas para **Magic: The Gathering, One Piece Card Game y Pokémon TCG**, con adaptadores independientes, estado en SQLite, cola persistente y notificaciones por webhook de Discord. Vigila anuncios, productos y promociones oficiales, los productos de **Tabletop Gamers, JJ Collection y Animefan**, y calendarios de torneos de tiendas de Madrid y alrededores. Conserva la integración de Secret Lair y Chaos Vault. El modelo remoto interpreta contenido ambiguo; el código conserva la autoridad sobre consultas, fechas, precios, disponibilidad, reglas, deduplicación y envíos.
 
 El contenedor usa Python 3.12 slim, un único servicio y un volumen. No publica puertos y no incluye ningún modelo, navegador ni servidor de inferencia.
 
@@ -31,7 +31,7 @@ Para actualizar un stack existente en Portainer, abre el stack creado desde Repo
 
 ## Fuentes y Discord
 
-Hay **16 fuentes activadas por defecto y 28 adaptadores registrados**. Los intervalos concretos y las fuentes opcionales figuran en [la guía multijuego](docs/multi-tcg.md).
+Hay **17 fuentes activadas por defecto y 29 adaptadores registrados**. Los intervalos concretos y las fuentes opcionales figuran en [la guía multijuego](docs/multi-tcg.md).
 
 | Cobertura activa | Fuentes |
 | --- | --- |
@@ -39,9 +39,11 @@ Hay **16 fuentes activadas por defecto y 28 adaptadores registrados**. Los inter
 | One Piece · 2 | Catálogo oficial occidental y anuncios/promociones oficiales de Bandai |
 | Pokémon · 2 | Noticias del portal oficial del JCC y prensa oficial en español |
 | Torneos locales · 3 | Donde Jugar TCG para seis tiendas cercanas, Mundicomics y Gladius Games |
-| Tiendas online · 2 | Tabletop Gamers y JJ Collection: productos, cartas, reservas, reposiciones y cambios de precio verificables |
+| Tiendas online · 3 | Tabletop Gamers, JJ Collection y Animefan: productos, cartas, reservas, reposiciones y cambios de precio verificables |
 
 Las nuevas tiendas se consultan cada cinco minutos con ventanas acotadas. También revisan productos conocidos: salir de portada no implica agotarse. El primer catálogo se registra silenciosamente, incluidas las fichas que se leen en comprobaciones posteriores. Los productos y sus variantes conservan la identidad de cada tienda; un precio o existencias de una tienda no se trasladan a otra. Consulta [cobertura, límites y activación de las tiendas](docs/retail-stores.md).
+
+Animefan sigue cartas y productos TCG por defecto. Sus figuras y coleccionables se pueden incluir expresamente con `include_collectibles=true` en `[sources.animefan]`; aparecen como coleccionables con su franquicia, sin convertir una figura de Pokémon o One Piece en un producto de cartas. Consulta [la guía de Animefan](docs/animefan.md).
 
 Las tres fuentes locales cubren inicialmente **ocho tiendas**. El [inventario de las 25 tiendas del chat compartido](docs/local-stores-coverage.json) distingue los calendarios comprobados de los perfiles activados. Madrid, Algete y Guadalajara tienen ampliaciones opcionales; las redes sociales de las tiendas no se rastrean.
 
@@ -98,7 +100,7 @@ Si el servidor exige autenticación, define `LLM_API_KEY` mediante variables pro
 
 Selecciona los juegos con `[games].enabled` en el TOML o con `ENABLED_TCGS=magic,one_piece,pokemon` en las variables del stack; la variable, cuando está definida, tiene prioridad. Las reglas admiten `tcgs`, `regions`, `cities` y `channels`, además de fuente, categoría, tipo de evento, estado y palabras clave. Los juegos y filtros geográficos se normalizan; las palabras clave ignoran mayúsculas. Dentro de una regla se deben cumplir todos los filtros, y basta con que coincida una regla para permitir la alerta. Consulta [ejemplos de configuración](docs/multi-tcg.md#seleccionar-juegos-y-reglas) y [cómo ampliar el sistema](docs/extending.md).
 
-Los productos de las dos tiendas respetan esa selección de juegos. Para recibir además otros TCG identificados en su catálogo, añade sus nombres, por ejemplo `ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,star_wars_unlimited,cyberpunk`. Esto habilita sus productos de tienda, sin crear nuevas fuentes oficiales de esos juegos. Los accesorios generales de cartas pueden carecer de juego y siguen la regla de tienda.
+Los productos TCG de las tiendas respetan esa selección de juegos. Para recibir además otros TCG identificados en su catálogo, añade sus nombres, por ejemplo `ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,star_wars_unlimited,cyberpunk`. Esto habilita sus productos de tienda, sin crear nuevas fuentes oficiales de esos juegos. Los accesorios generales de cartas pueden carecer de juego y siguen la regla de tienda.
 
 | Grupo | Opciones principales |
 | --- | --- |

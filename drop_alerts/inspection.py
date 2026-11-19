@@ -20,7 +20,7 @@ import httpx
 
 from .models import Event, safe_url
 from .notifications import discord_payload
-from .profiles import TCG_LABELS, event_profile, normalize_tcg
+from .profiles import TCG_LABELS, event_profile, normalize_tcg, source_scope_enabled
 from .rules import RuleEngine
 
 KINDS = ("announcement", "article", "event", "product")
@@ -82,6 +82,8 @@ def select_events(settings, *, tcg: str | None = None, kind: str | None = None, 
                         continue
                     cfg = settings.sources.get(event.source)
                     if not isinstance(cfg, dict) or not cfg.get("enabled", True):
+                        continue
+                    if not source_scope_enabled(event.source, current, cfg):
                         continue
                     profile = event_profile(current, event.source)
                     game = profile.get("tcg")
