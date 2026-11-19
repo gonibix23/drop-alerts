@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import httpx
 
 from .models import Event, safe_url
+from .profiles import TCG_LABELS
 
 
 class DeliveryError(Exception):
@@ -55,8 +56,9 @@ SOURCE_LABELS = {
     "arte9_events": "Arte 9 · Eventos",
     "ludoteca_events": "Ludoteca Maldita · Eventos",
     "jupiter_guadalajara_events": "Júpiter Guadalajara · Eventos",
+    "tabletop_gamers": "Tabletop Gamers · Tienda online",
+    "jjcollection": "JJ Collection · Tienda online",
 }
-TCG_LABELS = {"magic": "Magic: The Gathering", "one_piece": "One Piece Card Game", "pokemon": "Pokémon TCG"}
 TCG_COLORS = {"one_piece": 0xE75B56, "pokemon": 0xF2C94C}
 REGION_LABELS = {"EU": "Europa", "ES": "España", "US": "Estados Unidos", "NA": "Norteamérica",
                  "UK": "Reino Unido", "GB": "Reino Unido", "JP": "Japón", "GLOBAL": "Internacional",

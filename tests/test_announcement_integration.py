@@ -17,6 +17,7 @@ OFFICIAL = {
     "one_piece_products", "one_piece_news", "pokemon_tcg_news_es", "pokemon_press_es",
 }
 LOCAL = {"local_tcg_events", "mundicomics_events", "gladius_events"}
+RETAIL = {"tabletop_gamers", "jjcollection"}
 SECONDARY = {"magicspoiler", "mtggoldfish", "mtgdrops", "scg_news"}
 
 
@@ -25,8 +26,8 @@ def test_default_configuration_builds_official_and_local_sources_without_optiona
     store = Store(":memory:")
     try:
         sources = build_sources(settings, store)
-        assert {source.id for source in sources} == OFFICIAL | LOCAL
-        assert len(sources) == 14
+        assert {source.id for source in sources} == OFFICIAL | LOCAL | RETAIL
+        assert len(sources) == 16
         assert all(not settings.sources[source]["enabled"] for source in SECONDARY)
         assert SECONDARY <= SOURCE_FACTORIES.keys()
     finally:
@@ -38,7 +39,7 @@ def test_example_toml_builds_the_same_sources_and_slower_editorial_intervals():
     settings = Settings.from_env({"CONFIG_PATH": str(example)})
     store = Store(":memory:")
     try:
-        assert {source.id for source in build_sources(settings, store)} == OFFICIAL | LOCAL
+        assert {source.id for source in build_sources(settings, store)} == OFFICIAL | LOCAL | RETAIL
         assert all(not settings.sources[source]["enabled"] for source in SECONDARY)
         assert settings.sources["wpn_news"]["interval_seconds"] == 900
         assert settings.sources["magiccon_news"]["interval_seconds"] == 1800
@@ -52,7 +53,7 @@ def test_secondary_feed_is_built_only_when_explicitly_enabled():
     settings.sources["magicspoiler"]["enabled"] = True
     store = Store(":memory:")
     try:
-        assert {source.id for source in build_sources(settings, store)} == OFFICIAL | LOCAL | {"magicspoiler"}
+        assert {source.id for source in build_sources(settings, store)} == OFFICIAL | LOCAL | RETAIL | {"magicspoiler"}
     finally:
         store.close()
 

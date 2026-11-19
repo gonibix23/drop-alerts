@@ -9,11 +9,14 @@ python -m drop_alerts events --tcg one_piece --limit 10
 python -m drop_alerts events --tcg pokemon --kind article --limit 10
 python -m drop_alerts events --tcg magic --kind announcement --limit 10
 python -m drop_alerts events --tcg one_piece --kind event --limit 10
+python -m drop_alerts events --source tabletop_gamers --kind product --limit 10
 ```
 
 Sin `--tcg`, muestra las alertas que coincidan con los juegos habilitados y las reglas actuales. Se aceptan aliases como `mtg`, `onepiece` o `Pokémon`; los nombres se normalizan a identificadores estables. Un juego sin eventos o desactivado no devuelve alertas. `--limit` admite de 1 a 100.
 
 `--kind` permite `announcement`, `article`, `event` o `product`. Si lo omites, se incluyen los distintos tipos de elementos conservados. La lista también incluye cambios posteriores de un elemento, no solamente su primer anuncio. Las fuentes desactivadas y los registros que no cumplen las reglas actuales quedan excluidos; por ejemplo, una noticia general de Magic no se muestra si la regla requiere Secret Lair.
+
+`--source` limita a un identificador de fuente, como `tabletop_gamers` o `jjcollection`. Se combina con los demás filtros y no evita la selección de juegos ni las reglas actuales.
 
 Para integraciones o un resultado estructurado:
 
@@ -39,6 +42,8 @@ Se imprime el payload del mensaje con el formato actual de Discord. No se consul
 python -m drop_alerts preview --tcg one_piece --send
 python -m drop_alerts preview --tcg pokemon --kind article --send
 python -m drop_alerts preview --tcg magic --kind announcement --send
+python -m drop_alerts preview --source tabletop_gamers --kind product --send
+python -m drop_alerts preview --source jjcollection --kind product --send
 ```
 
 `--send` hace **una petición** al webhook ya configurado, mediante `DISCORD_WEBHOOK_URL` o su archivo de secreto. El mensaje lleva la marca **VISTA PREVIA MANUAL** para distinguirlo de una nueva detección. No necesitas copiar el webhook en la consola ni incorporarlo al comando.

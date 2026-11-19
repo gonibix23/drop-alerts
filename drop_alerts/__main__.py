@@ -92,11 +92,13 @@ def main() -> int:
     events = commands.add_parser("events", help="Consultar alertas guardadas, sin modificar su estado")
     events.add_argument("--tcg", type=tcg_argument)
     events.add_argument("--kind", choices=KINDS)
+    events.add_argument("--source", help="Limitar al identificador de una fuente, por ejemplo tabletop_gamers")
     events.add_argument("--limit", type=limit_argument, default=10)
     events.add_argument("--json", action="store_true", dest="as_json")
     preview = commands.add_parser("preview", help="Ver o enviar explícitamente una vista previa del último evento")
     preview.add_argument("--tcg", type=tcg_argument)
     preview.add_argument("--kind", choices=KINDS)
+    preview.add_argument("--source", help="Limitar al identificador de una fuente, por ejemplo jjcollection")
     preview.add_argument("--send", action="store_true")
     args = parser.parse_args()
     try:
@@ -113,7 +115,7 @@ def main() -> int:
         return asyncio.run(check_llm(settings))
     if args.command in ("events", "preview"):
         from .inspection import inspect_command
-        return asyncio.run(inspect_command(settings, args.command, tcg=args.tcg, kind=args.kind,
+        return asyncio.run(inspect_command(settings, args.command, tcg=args.tcg, kind=args.kind, source=args.source,
                                           limit=getattr(args, "limit", 10), send=getattr(args, "send", False),
                                           as_json=getattr(args, "as_json", False)))
     logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(message)s")

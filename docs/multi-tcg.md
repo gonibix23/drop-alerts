@@ -2,7 +2,7 @@
 
 Drop Alerts identifica cada elemento por su fuente e identidad estable y añade un perfil de juego, región, idioma de la fuente y canal. La cobertura implementada incluye `magic`, `one_piece` y `pokemon`. Los productos, anuncios y torneos comparten persistencia y reglas, pero conservan estados y fechas propios.
 
-La configuración predeterminada activa **14 fuentes de las 26 registradas**: siete de Magic, dos de One Piece, dos de Pokémon y tres de torneos locales. Los adaptadores usan HTTP y contenido público estructurado o HTML, sin navegador ni otro contenedor. Esta guía describe la cobertura configurada; las comprobaciones y sus límites se documentan en [verificación](verification.md).
+La configuración predeterminada activa **16 fuentes de las 28 registradas**: siete de Magic, dos de One Piece, dos de Pokémon, tres de torneos locales y dos tiendas online. Los adaptadores usan HTTP y contenido público estructurado o HTML, sin navegador ni otro contenedor. Esta guía describe la cobertura configurada; las comprobaciones y sus límites se documentan en [verificación](verification.md).
 
 ## Fuentes activadas por defecto
 
@@ -22,10 +22,14 @@ La configuración predeterminada activa **14 fuentes de las 26 registradas**: si
 | Torneos | `local_tcg_events` | Calendarios públicos de Donde Jugar TCG para seis tiendas cercanas | 30 min |
 | Torneos | `mundicomics_events` | [Agenda de Mundicomics](https://www.mundicomics.com/torneos-tcg) | 30 min |
 | Torneos | `gladius_events` | [Torneos de Gladius Games](https://gladiusgames.net/es/238-torneos-tcg), con detalle de cada evento | 30 min |
+| Tienda | `tabletop_gamers` | [Tabletop Gamers](https://tabletopgamers.es/): productos y accesorios TCG, reservas, stock y precios | 5 min |
+| Tienda | `jjcollection` | [JJ Collection](https://www.jjcollection.es/): productos y cartas por variante, reservas, stock y precios | 5 min |
 
 Los intervalos de cinco minutos siguen `POLL_INTERVAL_SECONDS`; los demás tienen `interval_seconds` propio en el ejemplo. Las consultas y los detalles tienen límites de tiempo, tamaño y número de elementos. Las ventanas rotan para revisar contenido conocido y nuevo: no se promete descubrir toda una hemeroteca en una sola comprobación.
 
 Los adaptadores y reglas de Magic mantienen su funcionamiento anterior. El perfil de juego se aplica también a los registros antiguos de fuentes Magic conocidas, conservando sus identificadores y la deduplicación. El cambio multijuego mantiene el esquema SQLite 2; no requiere borrar ni recrear la base. Una fuente desconocida no se convierte automáticamente en Magic por su título.
+
+Las tiendas tienen perfil mixto y sus productos identificados respetan `ENABLED_TCGS`. Se pueden seleccionar también Riftbound, Lorcana, Dragon Ball y otros juegos que aparezcan explícitamente en las fichas. Los accesorios generales de cartas pueden no tener juego asignado. La [guía de tiendas](retail-stores.md) explica la cobertura y las limitaciones de la revisión por ventanas.
 
 ## Fuentes opcionales
 

@@ -90,6 +90,26 @@ def test_disabled_game_and_source_are_not_returned(saved):
     assert select_events(config, tcg="one_piece") == []
 
 
+def test_source_filter_combines_with_game_and_kind_and_keeps_rules(saved):
+    config, ids = saved
+    assert [event.id for event in select_events(config, source="one_piece_products")] == [ids[1]]
+    assert select_events(config, source="one_piece_products", kind="event") == []
+    assert select_events(config, source="one_piece_products", tcg="pokemon") == []
+    assert select_events(config, source="absent_store") == []
+    config.sources["one_piece_products"]["enabled"] = False
+    assert select_events(config, source="one_piece_products") == []
+
+
+@pytest.mark.asyncio
+async def test_preview_uses_the_selected_source_without_other_sources_or_side_effects(saved, capsys):
+    config, _ = saved
+    before = snapshot(config.database_path)
+    assert await inspect_command(config, "preview", source="pokemon_tcg_news_es") == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert "Pokémon nueva colección" in payload["embeds"][0]["title"]
+    assert snapshot(config.database_path) == before
+
+
 def test_source_with_implicit_enabled_and_future_game_name_is_supported(saved):
     config, ids = saved
     config.sources["one_piece_news"] = {"interval_seconds": 900}
@@ -300,7 +320,7 @@ def test_main_dispatches_readonly_inspection_without_store(saved, monkeypatch, c
     def forbidden(*args, **kwargs):
         raise AssertionError("No production Store constructor")
     monkeypatch.setattr(cli, "Store", forbidden)
-    monkeypatch.setattr("sys.argv", ["drop-alerts", "events", "--tcg", "One Piece", "--kind", "event", "--limit", "1", "--json"])
+    monkeypatch.setattr("sys.argv", ["drop-alerts", "events", "--tcg", "One Piece", "--source", "one_piece_news", "--kind", "event", "--limit", "1", "--json"])
     assert cli.main() == 0
     rows = json.loads(capsys.readouterr().out)
     assert len(rows) == 1 and rows[0]["tcg"] == "one_piece"

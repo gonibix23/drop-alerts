@@ -110,6 +110,16 @@ interval_seconds = 3600
 enabled = false
 interval_seconds = 3600
 
+# Productos, cartas, reservas y reposiciones de las tiendas españolas.
+# Los productos con juego identificado respetan [games].enabled / ENABLED_TCGS.
+[sources.tabletop_gamers]
+enabled = true
+interval_seconds = 300
+
+[sources.jjcollection]
+enabled = true
+interval_seconds = 300
+
 # Los filtros de una regla se combinan con AND; valores dentro de un filtro, OR.
 # Una lista vacía no restringe ese campo. Al menos una regla debe coincidir.
 [[rules]]
@@ -159,4 +169,11 @@ kinds = ["event"]
 sources = ["local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events"]
 # Opcional: cities = ["Alcalá de Henares", "Torrejón de Ardoz"]
 # Opcional: regions = ["EU"]
+require_analysis = false
+
+[[rules]]
+id = "retail-card-drops"
+sources = ["tabletop_gamers", "jjcollection"]
+kinds = ["product", "collection"]
+event_types = ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]
 require_analysis = false

@@ -73,6 +73,8 @@ class Settings:
         "arte9_events": {"enabled": False, "interval_seconds": 3600},
         "ludoteca_events": {"enabled": False, "interval_seconds": 3600},
         "jupiter_guadalajara_events": {"enabled": False, "interval_seconds": 3600},
+        "tabletop_gamers": {"enabled": True, "interval_seconds": 300},
+        "jjcollection": {"enabled": True, "interval_seconds": 300},
     })
     rules: list[dict] = field(default_factory=lambda: [
         {"id": "store", "sources": ["secret_lair_eu"]},
@@ -83,6 +85,8 @@ class Settings:
         {"id": "pokemon-announcements", "tcgs": ["pokemon"], "sources": ["pokemon_tcg_news_es", "pokemon_press_es", "pokemon_products_es", "pokemon_products_us", "pokemon_news_jp"]},
         {"id": "local-tcg-tournaments", "tcgs": ["magic", "one_piece", "pokemon"], "kinds": ["event"],
          "sources": ["local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events"]},
+        {"id": "retail-card-drops", "sources": ["tabletop_gamers", "jjcollection"], "kinds": ["product", "collection"],
+         "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
     ])
 
     @classmethod

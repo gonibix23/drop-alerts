@@ -6,6 +6,8 @@ from .sources.official_announcements import ChaosVaultSource, WPNNewsSource, Mag
 from .sources.one_piece import OnePieceProductsSource, OnePieceNewsSource
 from .sources.pokemon import PokemonProductsSource, PokemonUSProductsSource, PokemonTCGNewsSource, PokemonPressSource, PokemonJapanNewsSource
 from .sources.local_events import LocalTCGEventsSource, MundicomicsEventsSource, MADRID_STORES
+from .sources.tabletop import TabletopGamersSource
+from .sources.jjcollection import JJCollectionSource
 from .profiles import SOURCE_PROFILES
 
 
@@ -46,6 +48,8 @@ SOURCE_FACTORIES = {
     **{name: (lambda settings, store, source_id=name: _store_calendar(source_id, settings))
        for name in ("gladius_events", "nextdice_events", "arte9_events", "ludoteca_events")},
     "jupiter_guadalajara_events": lambda settings, store: _jupiter_calendar(settings),
+    "tabletop_gamers": lambda settings, store: TabletopGamersSource(max_items=min(12, settings.source_max_items)),
+    "jjcollection": lambda settings, store: JJCollectionSource(max_items=min(12, settings.source_max_items)),
 }
 
 

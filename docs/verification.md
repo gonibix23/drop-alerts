@@ -1,6 +1,17 @@
 # Estado de verificación de la entrega
 
-Comprobado el 21 de octubre de 2026. El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts).
+El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts). Las comprobaciones se detallan por versión y fecha.
+
+## Actualización 1.4: tiendas online (19/11/2026)
+
+- `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-retail-final`: **739 pruebas aprobadas**, Python 3.14 en Windows. Compilación de módulos con `compileall` y revisión de formato completadas correctamente.
+- Comprobación real conjunta de `tabletop_gamers` y `jjcollection`, mediante `SourceHTTP`, HTTPS y TLS verificado, con SQLite en memoria, sin IA ni webhook: **cuatro productos por fuente**, cero errores parciales, **0 notificaciones pendientes** durante el arranque silencioso y **0 eventos adicionales** al repetir exactamente los mismos resultados. Los estados observados incluyeron disponibles, agotados y reservas; las ventanas acotadas no representan el catálogo completo.
+- Las verificaciones individuales ampliadas extrajeron ocho productos de Tabletop y doce variantes de JJ Collection, sin errores parciales. JJ descubrió 213 URLs distintas en el sitemap examinado. Las capturas completas y diagnósticos están en `work/research/`, excluidos de Git; se incluyen fixtures reducidos para las pruebas.
+- Las pruebas nuevas comprueban correlación de precio y stock por variante, rebajas, reservas, estados contradictorios, páginas bloqueadas, ausencia de productos, reposiciones, inventarios diferidos silenciosos tras reinicios, presupuestos de consulta, fichas lentas y rotación persistente. La integración prueba reglas por juego, estados separados entre tiendas, ausencia de ruido por cambios de cantidad y selección por `--source` en consultas de solo lectura.
+- `docker compose --env-file .env.example config --quiet`: configuración válida. `pip check`: sin incompatibilidades. El motor Docker local sigue sin estar disponible (`docker_engine` ausente); la construcción y el arranque de cada revisión se verifican en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions).
+- Se conservan esquema SQLite 2, dependencias, puertos y volumen. La versión predeterminada tiene **16 fuentes activas y 28 registradas**. No se ha accedido a Portainer ni se ha enviado una notificación real. La conectividad y permisos de tu despliegue siguen comprobándose allí.
+
+Consulta [la guía de tiendas](retail-stores.md) y la investigación de [Tabletop Gamers](research-tabletop.md) y [JJ Collection](research-jjcollection.md). Las verificaciones siguientes corresponden a versiones anteriores.
 
 ## Actualización 1.3: varios TCG y calendarios (25/10/2026)
 

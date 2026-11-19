@@ -46,11 +46,13 @@ def tcg_filter(value: str) -> str:
     return normalized
 
 
-def select_events(settings, *, tcg: str | None = None, kind: str | None = None, limit: int = 10) -> list[Event]:
+def select_events(settings, *, tcg: str | None = None, kind: str | None = None, source: str | None = None, limit: int = 10) -> list[Event]:
     if type(limit) is not int or not 1 <= limit <= 100:
         raise ValueError("El límite debe estar entre 1 y 100")
     if kind is not None and kind not in KINDS:
         raise ValueError("Tipo de elemento no admitido")
+    if source is not None and (not isinstance(source, str) or not source.strip()):
+        raise ValueError("Fuente no válida")
     tcg = tcg_filter(tcg) if tcg is not None else None
     try:
         path = Path(settings.database_path).resolve()
@@ -73,6 +75,8 @@ def select_events(settings, *, tcg: str | None = None, kind: str | None = None, 
                     continue
                 try:
                     event = Event(**json.loads(raw[0]))
+                    if source is not None and event.source != source:
+                        continue
                     current = event.data["current"]
                     if not isinstance(current, dict):
                         continue
@@ -189,9 +193,9 @@ async def send_preview(settings, payload: dict, *, client: httpx.AsyncClient | N
         return PreviewDelivery(False, error=type(exc).__name__)
 
 
-async def inspect_command(settings, command: str, *, tcg=None, kind=None, limit=10, send=False, as_json=False) -> int:
+async def inspect_command(settings, command: str, *, tcg=None, kind=None, source=None, limit=10, send=False, as_json=False) -> int:
     try:
-        events = select_events(settings, tcg=tcg, kind=kind, limit=1 if command == "preview" else limit)
+        events = select_events(settings, tcg=tcg, kind=kind, source=source, limit=1 if command == "preview" else limit)
         if command == "events":
             print(json.dumps([event_record(event) for event in events], ensure_ascii=False, indent=2)
                   if as_json else format_events(events, settings.timezone))
