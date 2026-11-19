@@ -8,13 +8,15 @@ import unicodedata
 TCG_LABELS = {"magic": "Magic: The Gathering", "one_piece": "One Piece Card Game", "pokemon": "Pokémon TCG",
               "riftbound": "Riftbound", "lorcana": "Disney Lorcana", "dragon_ball": "Dragon Ball",
               "digimon": "Digimon Card Game", "yugioh": "Yu-Gi-Oh!", "star_wars_unlimited": "Star Wars: Unlimited",
-              "cyberpunk": "Cyberpunk TCG"}
+              "cyberpunk": "Cyberpunk TCG", "gundam": "Gundam Card Game", "jurassic_park": "Jurassic Park TCG"}
 ALIASES = {"mtg": "magic", "magic_the_gathering": "magic", "onepiece": "one_piece",
            "one_piece_card_game": "one_piece", "one_piece_tcg": "one_piece", "onepiecetcg": "one_piece",
            "pokemon_tcg": "pokemon", "pokemontcg": "pokemon", "jcc_pokemon": "pokemon",
            "disney_lorcana": "lorcana", "dragonball": "dragon_ball", "dragon_ball_super": "dragon_ball",
            "yu_gi_oh": "yugioh", "yu_gi_oh_tcg": "yugioh", "swu": "star_wars_unlimited",
-           "cyberpunk_tcg": "cyberpunk", "digimon_card_game": "digimon"}
+           "cyberpunk_tcg": "cyberpunk", "digimon_card_game": "digimon",
+           "gundam_card_game": "gundam", "gundam_tcg": "gundam", "jurassicpark": "jurassic_park",
+           "jurassic_park_tcg": "jurassic_park", "jurassic_park_card_game": "jurassic_park"}
 
 
 def normalized_name(value: str) -> str:
@@ -42,7 +44,7 @@ SOURCE_PROFILES = {
     "pokemon_products_us": {"tcg": "pokemon", "region": "US", "language": "en", "channel": "online"},
     "pokemon_news_jp": {"tcg": "pokemon", "region": "JP", "language": "ja", "channel": "news"},
     **{name: {"region": "EU", "country": "ES", "language": "es", "channel": "online"}
-       for name in ("tabletop_gamers", "jjcollection", "animefan")},
+       for name in ("tabletop_gamers", "jjcollection", "animefan", "zial_tcg")},
     **{name: {"region": "EU", "language": "es", "channel": "event", "timezone": "Europe/Madrid", "tcgs": ["magic", "one_piece", "pokemon"]}
        for name in ("local_tcg_events", "local_tcg_events_madrid", "mundicomics_events", "gladius_events", "nextdice_events", "arte9_events", "ludoteca_events", "jupiter_guadalajara_events")},
 }

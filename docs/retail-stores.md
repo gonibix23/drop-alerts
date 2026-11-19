@@ -4,6 +4,8 @@ Desde la versión 1.4, `tabletop_gamers` y `jjcollection` se activan por defecto
 
 La versión 1.4.1 añade también `animefan`, con el mismo intervalo y seguimiento de cartas por defecto. Sus figuras y coleccionables tienen una opción de activación independiente; consulta [la guía de Animefan](animefan.md).
 
+La versión 1.4.2 incorpora Zial TCG mediante `zial_tcg`, con el mismo intervalo y alcance de cartas y accesorios TCG. Además de recorrer sus listados por ventanas, revisa en cada ronda el producto Commander Warhammer 40K enlazado. Su [guía de configuración](zial.md) contiene los bloques para actualizar un TOML propio.
+
 ## Qué se consulta
 
 | Fuente | Método ligero | Cobertura |
@@ -11,8 +13,9 @@ La versión 1.4.1 añade también `animefan`, con el mismo intervalo y seguimien
 | [Tabletop Gamers](https://tabletopgamers.es/) | Catálogos HTML de WooCommerce, paginación pública y fichas con Product JSON-LD contrastado con información visible | Productos y accesorios de cartas, novedades y reservas. Revisión rotatoria de fichas conocidas. |
 | [JJ Collection](https://www.jjcollection.es/) | Sitemaps públicos y fichas HTML de Shopify, con ofertas JSON-LD y metadatos de cada variante | Productos, cartas y accesorios TCG; cada variante mantiene precio y disponibilidad propios. |
 | [Animefan](https://animefan.es/) | Categorías públicas y fichas de WooCommerce contrastadas con sus metadatos | Cartas y productos TCG; figuras y coleccionables solo si se activa su opción. |
+| [Zial TCG](https://www.zialtcg.com/) | Catálogos HTML WooCommerce y fichas principales contrastadas con Product/Offer JSON-LD | Juegos de cartas, preventas y accesorios; el display Commander Warhammer 40K enlazado se revisa cada ronda. |
 
-Los métodos y respuestas reales comprobados el **19 de noviembre de 2026** están en los estudios de [Tabletop](research-tabletop.md) y [JJ Collection](research-jjcollection.md). No se usan cuentas, APIs privadas, carrito, navegadores ni acciones de compra. Las rutas restringidas en los robots examinados se evitan.
+Los métodos y respuestas reales comprobados el **19 de noviembre de 2026** están en los estudios de [Tabletop](research-tabletop.md), [JJ Collection](research-jjcollection.md), [Animefan](research-animefan.md) y [Zial TCG](research-zial.md). No se usan cuentas, APIs privadas, carrito, navegadores ni acciones de compra. Las rutas restringidas en los robots examinados se evitan.
 
 Cada ronda visita un número acotado de páginas y detalles. Parte del presupuesto busca identidades nuevas y otra parte rota los productos ya conocidos, incluidos los agotados, para detectar reposiciones aunque salgan de portada. Los cursores persisten tras reinicios. **Cinco minutos es el intervalo entre rondas, no una garantía de revisar todas las fichas cada cinco minutos.** El tiempo de revisión completa depende del catálogo, sus cambios y los errores de red. No se promete cobertura completa de todo el archivo ni detectar una venta que se agote entre dos consultas.
 
@@ -34,7 +37,7 @@ En JJ Collection, una variante española agotada y otra inglesa disponible son e
 Se mantienen los juegos seleccionados por `ENABLED_TCGS` o `[games].enabled`. Con el valor inicial se avisa de Magic, One Piece y Pokémon. Para recibir también otros juegos identificados explícitamente en las fichas, amplía la lista, por ejemplo:
 
 ```dotenv
-ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,digimon,yugioh,star_wars_unlimited,cyberpunk
+ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,digimon,yugioh,star_wars_unlimited,cyberpunk,gundam,jurassic_park
 ```
 
 Las etiquetas adicionales permiten filtrar productos de las tiendas; no crean adaptadores de anuncios oficiales de esos juegos. La clasificación usa título y categorías del producto, nunca los menús generales de la web. Los accesorios generales para cartas pueden no tener un juego asignado y se permiten mediante la regla de tiendas. Las tarjetas regalo y entradas de torneo quedan fuera del seguimiento comercial. Tabletop y JJ Collection excluyen figuras sueltas; Animefan permite activarlas con `include_collectibles=true`, sin etiquetarlas como TCG ni vincularlas a `ENABLED_TCGS`.
@@ -76,6 +79,8 @@ require_analysis = false
 
 Intégralos en tu archivo existente sin duplicar identificadores. Comprueba los logs y `python -m drop_alerts status` en el contenedor. No hacen falta variables nuevas para activar estas fuentes si utilizas la configuración incluida en la imagen.
 
+Animefan y Zial TCG tienen sus propios bloques de fuente y regla. Si tu TOML es anterior a su incorporación, añade los ejemplos de [Animefan](animefan.md) y [Zial TCG](zial.md); actualizar la imagen no los introduce automáticamente en un archivo montado.
+
 ## Consultar y probar un mensaje
 
 Desde la consola del contenedor en Portainer:
@@ -86,6 +91,7 @@ python -m drop_alerts events --source jjcollection --tcg pokemon --limit 10
 python -m drop_alerts preview --source tabletop_gamers --kind product
 python -m drop_alerts preview --source jjcollection --kind product
 python -m drop_alerts preview --source animefan --kind product
+python -m drop_alerts preview --source zial_tcg --kind product
 ```
 
 `preview` imprime el mensaje. Añade `--send` para enviarlo expresamente al webhook configurado, con la marca de vista previa manual. No modifica la deduplicación ni la cola. La consulta incluye los eventos conservados del arranque silencioso y respeta los juegos, fuentes y reglas actuales. Espera a la primera comprobación correcta si todavía no hay resultados. Véase [la guía de inspección](inspecting-alerts.md).

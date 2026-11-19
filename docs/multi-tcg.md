@@ -2,7 +2,7 @@
 
 Drop Alerts identifica cada elemento por su fuente e identidad estable y añade un perfil de juego, región, idioma de la fuente y canal. La cobertura implementada incluye `magic`, `one_piece` y `pokemon`. Los productos, anuncios y torneos comparten persistencia y reglas, pero conservan estados y fechas propios.
 
-La configuración predeterminada activa **17 fuentes de las 29 registradas**: siete de Magic, dos de One Piece, dos de Pokémon, tres de torneos locales y tres tiendas online. Los adaptadores usan HTTP y contenido público estructurado o HTML, sin navegador ni otro contenedor. Esta guía describe la cobertura configurada; las comprobaciones y sus límites se documentan en [verificación](verification.md).
+La configuración predeterminada activa **18 fuentes de las 30 registradas**: siete de Magic, dos de One Piece, dos de Pokémon, tres de torneos locales y cuatro tiendas online. Los adaptadores usan HTTP y contenido público estructurado o HTML, sin navegador ni otro contenedor. Esta guía describe la cobertura configurada; las comprobaciones y sus límites se documentan en [verificación](verification.md).
 
 ## Fuentes activadas por defecto
 
@@ -25,12 +25,15 @@ La configuración predeterminada activa **17 fuentes de las 29 registradas**: si
 | Tienda | `tabletop_gamers` | [Tabletop Gamers](https://tabletopgamers.es/): productos y accesorios TCG, reservas, stock y precios | 5 min |
 | Tienda | `jjcollection` | [JJ Collection](https://www.jjcollection.es/): productos y cartas por variante, reservas, stock y precios | 5 min |
 | Tienda | `animefan` | [Animefan](https://animefan.es/): cartas TCG, reservas y reposiciones; figuras y coleccionables opcionales | 5 min |
+| Tienda | `zial_tcg` | [Zial TCG](https://www.zialtcg.com/): cartas, preventas y accesorios; revisión explícita del display Commander Warhammer 40K enlazado | 5 min |
 
-Los intervalos de cinco minutos siguen `POLL_INTERVAL_SECONDS`; los demás tienen `interval_seconds` propio en el ejemplo. Las consultas y los detalles tienen límites de tiempo, tamaño y número de elementos. Las ventanas rotan para revisar contenido conocido y nuevo: no se promete descubrir toda una hemeroteca en una sola comprobación.
+Cada fuente usa su `interval_seconds` del ejemplo; si no lo declara, sigue `POLL_INTERVAL_SECONDS`. Las tiendas online tienen un intervalo propio inicial de 300 segundos. Las consultas y los detalles tienen límites de tiempo, tamaño y número de elementos. Las ventanas rotan para revisar contenido conocido y nuevo: no se promete descubrir toda una hemeroteca en una sola comprobación.
 
 Los adaptadores y reglas de Magic mantienen su funcionamiento anterior. El perfil de juego se aplica también a los registros antiguos de fuentes Magic conocidas, conservando sus identificadores y la deduplicación. El cambio multijuego mantiene el esquema SQLite 2; no requiere borrar ni recrear la base. Una fuente desconocida no se convierte automáticamente en Magic por su título.
 
 Las tiendas tienen perfil mixto y sus productos identificados respetan `ENABLED_TCGS`. Se pueden seleccionar también Riftbound, Lorcana, Dragon Ball y otros juegos que aparezcan explícitamente en las fichas. Los accesorios generales de cartas pueden no tener juego asignado. La [guía de tiendas](retail-stores.md) explica la cobertura y las limitaciones de la revisión por ventanas. En Animefan se pueden activar [figuras y coleccionables](animefan.md) como ámbito independiente, con `include_collectibles=true`; no usan una etiqueta TCG por compartir una franquicia.
+
+Zial TCG utiliza los catálogos de juegos de cartas, preventa y accesorios, con una ventana de detalles y revisión de productos conocidos. El display Commander Warhammer 40K se consulta en cada ronda, incluso si deja de aparecer en esas páginas. La [guía de Zial](zial.md) explica cómo una preventa conserva `UPCOMING` aunque la ficha permita reservar unidades. Para recibir también los productos Gundam o Jurassic Park TCG identificados, añade `gundam` o `jurassic_park` a `ENABLED_TCGS`; los tres juegos predeterminados siguen siendo Magic, One Piece y Pokémon.
 
 ## Fuentes opcionales
 

@@ -9,6 +9,7 @@ from .sources.local_events import LocalTCGEventsSource, MundicomicsEventsSource,
 from .sources.tabletop import TabletopGamersSource
 from .sources.jjcollection import JJCollectionSource
 from .sources.animefan import AnimefanSource
+from .sources.zial import ZialTCGSource
 from .profiles import SOURCE_PROFILES
 
 
@@ -53,6 +54,7 @@ SOURCE_FACTORIES = {
     "jjcollection": lambda settings, store: JJCollectionSource(max_items=min(12, settings.source_max_items)),
     "animefan": lambda settings, store: AnimefanSource(max_items=min(12, settings.source_max_items),
         include_collectibles=settings.sources["animefan"].get("include_collectibles", False)),
+    "zial_tcg": lambda settings, store: ZialTCGSource(max_items=min(12, settings.source_max_items)),
 }
 
 

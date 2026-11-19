@@ -59,6 +59,7 @@ SOURCE_LABELS = {
     "tabletop_gamers": "Tabletop Gamers · Tienda online",
     "jjcollection": "JJ Collection · Tienda online",
     "animefan": "Animefan · Tienda online",
+    "zial_tcg": "Zial TCG · Tienda online",
 }
 TCG_COLORS = {"one_piece": 0xE75B56, "pokemon": 0xF2C94C}
 REGION_LABELS = {"EU": "Europa", "ES": "España", "US": "Estados Unidos", "NA": "Norteamérica",

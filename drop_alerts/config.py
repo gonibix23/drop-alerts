@@ -76,6 +76,7 @@ class Settings:
         "tabletop_gamers": {"enabled": True, "interval_seconds": 300},
         "jjcollection": {"enabled": True, "interval_seconds": 300},
         "animefan": {"enabled": True, "interval_seconds": 300, "include_collectibles": False},
+        "zial_tcg": {"enabled": True, "interval_seconds": 300},
     })
     rules: list[dict] = field(default_factory=lambda: [
         {"id": "store", "sources": ["secret_lair_eu"]},
@@ -89,6 +90,8 @@ class Settings:
         {"id": "retail-card-drops", "sources": ["tabletop_gamers", "jjcollection"], "kinds": ["product", "collection"],
          "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
         {"id": "animefan-drops", "sources": ["animefan"], "kinds": ["product", "collection"],
+         "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
+        {"id": "zial-drops", "sources": ["zial_tcg"], "kinds": ["product", "collection"],
          "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
     ])
 

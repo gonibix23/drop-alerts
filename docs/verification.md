@@ -2,6 +2,17 @@
 
 El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts). Las comprobaciones se detallan por versión y fecha.
 
+## Actualización 1.4.2: Zial TCG y producto enlazado (19/11/2026)
+
+- `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-zial-final`: **829 pruebas aprobadas**, Python 3.14 en Windows. `compileall`, `pip check`, la validación del Compose y la revisión de formato terminaron correctamente.
+- Consulta real de `zial_tcg` con `SourceHTTP`, HTTPS/TLS verificado y SQLite en memoria: **12 productos y seis páginas de catálogo**, sin errores parciales. Se observaron seis preventas, cuatro productos disponibles y dos agotados en esa ventana. El arranque silencioso dejó **0 notificaciones pendientes**; repetir los resultados generó **0 eventos nuevos**. No se hicieron inferencias ni envíos a Discord.
+- El producto enlazado por el usuario, Commander Deck Display Warhammer 40K, quedó identificado como `product:11533` y `UPCOMING`, con precio EUR comprobado. Se consulta expresamente cada ronda. La cantidad reservable no se presenta como stock para entrega inmediata, porque la propia ficha indica preventa. Los importes y estados corresponden al momento de la consulta.
+- Las **41 pruebas del adaptador** cubren respuestas reales guardadas, precio actual frente a tachado, SKU comercial independiente del ID WooCommerce, divisa, reservas, stock negativo, variantes sin verificar, exclusión de figuras/entradas/ruletas, géneros explícitos de cartas, cuotas y límites de consulta, reposiciones fuera del listado y la recuperación silenciosa del producto enlazado tras un fallo inicial y un reinicio.
+- La selección de juegos sigue siendo Magic, One Piece y Pokémon. Se añaden etiquetas opcionales para productos identificados como `gundam` y `jurassic_park`, sin crear fuentes oficiales nuevas ni activar esos juegos automáticamente. Hay **18 fuentes activas y 30 registradas**, con el esquema SQLite 2, volumen y dependencias existentes.
+- El motor Docker local sigue sin estar disponible. La construcción y ejecución de cada revisión se verifican en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions). No se ha accedido a Portainer ni se ha probado una entrega real. Las capturas completas de trabajo se guardan en `work/research/zial/`, excluido de Git; las pruebas incluyen extractos reducidos.
+
+Consulta [la guía de Zial TCG](zial.md) y [la investigación de la fuente](research-zial.md). Las verificaciones siguientes son históricas.
+
 ## Actualización 1.4.1: Animefan, solo TCG (19/11/2026)
 
 - `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-animefan-final`: **784 pruebas aprobadas**, Python 3.14 en Windows. Se completaron también `compileall`, `pip check` y la validación del Compose sin errores.

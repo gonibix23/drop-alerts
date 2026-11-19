@@ -14,7 +14,7 @@ from drop_alerts.storage import Store
 
 
 def product(source, *, identity="card-42", state="UNAVAILABLE", price="29.95", tcg="pokemon"):
-    host = "tabletopgamers.es" if source == "tabletop_gamers" else "www.jjcollection.es"
+    host = {"tabletop_gamers": "tabletopgamers.es", "jjcollection": "www.jjcollection.es", "zial_tcg": "www.zialtcg.com"}[source]
     data = {"region": "EU", "country": "ES", "language": "es", "channel": "retail",
             "availability_verified": True, "price_verified": True, "price": price, "currency": "EUR"}
     if tcg is not None:
@@ -27,7 +27,7 @@ def ingest(store, settings, item):
     return store.ingest(item.source, FetchResult([item]), DetectionEngine(), RuleEngine(settings.rules), settings)
 
 
-@pytest.mark.parametrize("source", ["tabletop_gamers", "jjcollection"])
+@pytest.mark.parametrize("source", ["tabletop_gamers", "jjcollection", "zial_tcg"])
 def test_store_bootstrap_restart_restock_and_repeat_are_durable(tmp_path, source):
     config = Settings(llm_enabled=False)
     path = str(tmp_path / "retail.db")
@@ -76,7 +76,7 @@ def test_stock_quantity_wording_does_not_notify_without_a_state_or_price_change(
     store.close()
 
 
-@pytest.mark.parametrize("source", ["tabletop_gamers", "jjcollection"])
+@pytest.mark.parametrize("source", ["tabletop_gamers", "jjcollection", "zial_tcg"])
 def test_retail_preorder_price_and_source_are_rendered_from_verified_data(source):
     store = Store(":memory:")
     config = Settings(llm_enabled=False, bootstrap_mode="notify")
@@ -108,7 +108,9 @@ def test_retail_selection_filters_games_but_retains_generic_card_supplies():
 
 @pytest.mark.parametrize("alias,canonical,label", [("Riftbound", "riftbound", "Riftbound"),
     ("Disney Lorcana", "lorcana", "Disney Lorcana"), ("DragonBall", "dragon_ball", "Dragon Ball"),
-    ("Yu-Gi-Oh!", "yugioh", "Yu-Gi-Oh!"), ("SWU", "star_wars_unlimited", "Star Wars: Unlimited")])
+    ("Yu-Gi-Oh!", "yugioh", "Yu-Gi-Oh!"), ("SWU", "star_wars_unlimited", "Star Wars: Unlimited"),
+    ("Gundam Card Game", "gundam", "Gundam Card Game"),
+    ("Jurassic Park TCG", "jurassic_park", "Jurassic Park TCG")])
 def test_other_store_games_can_be_selected_and_rendered(alias, canonical, label):
     config = Settings.from_env({"ENABLED_TCGS": alias})
     assert config.enabled_tcgs == [canonical]

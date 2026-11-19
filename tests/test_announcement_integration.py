@@ -17,7 +17,7 @@ OFFICIAL = {
     "one_piece_products", "one_piece_news", "pokemon_tcg_news_es", "pokemon_press_es",
 }
 LOCAL = {"local_tcg_events", "mundicomics_events", "gladius_events"}
-RETAIL = {"tabletop_gamers", "jjcollection", "animefan"}
+RETAIL = {"tabletop_gamers", "jjcollection", "animefan", "zial_tcg"}
 SECONDARY = {"magicspoiler", "mtggoldfish", "mtgdrops", "scg_news"}
 
 
@@ -27,7 +27,7 @@ def test_default_configuration_builds_official_and_local_sources_without_optiona
     try:
         sources = build_sources(settings, store)
         assert {source.id for source in sources} == OFFICIAL | LOCAL | RETAIL
-        assert len(sources) == 17
+        assert len(sources) == 18
         assert all(not settings.sources[source]["enabled"] for source in SECONDARY)
         assert SECONDARY <= SOURCE_FACTORIES.keys()
     finally:
