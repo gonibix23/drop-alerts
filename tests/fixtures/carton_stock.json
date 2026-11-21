@@ -1,0 +1,36 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "product_id": 23236,
+    "product_template_id": 19839,
+    "display_name": "Fundas Dragón Magenta (63x88 Opacas Standard) - 120 uds. - Tranjis",
+    "is_combination_possible": true,
+    "list_price": 4.99,
+    "price": 4.49,
+    "has_discounted_price": true,
+    "show_extra_price": true,
+    "prevent_zero_price_sale": false,
+    "is_storable": true,
+    "allow_out_of_stock_order": false,
+    "available_threshold": 5.0,
+    "free_qty": 18,
+    "cart_qty": 0.0,
+    "uom_name": "Unidades",
+    "uom_rounding": 0.01,
+    "show_availability": false,
+    "out_of_stock_message": false,
+    "has_stock_notification": false,
+    "stock_notification_email": "",
+    "is_in_wishlist": false,
+    "product_tracking_info": {
+      "item_id": "8437028641748",
+      "item_name": "Fundas Dragón Magenta (63x88 Opacas Standard) - 120 uds. - Tranjis",
+      "item_category": "Accesorios generales / Tranjis",
+      "currency": "EUR",
+      "price": 4.99
+    },
+    "currency_precision": 2,
+    "no_product_change": true
+  }
+}

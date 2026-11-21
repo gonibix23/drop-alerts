@@ -60,6 +60,7 @@ SOURCE_LABELS = {
     "jjcollection": "JJ Collection · Tienda online",
     "animefan": "Animefan · Tienda online",
     "zial_tcg": "Zial TCG · Tienda online",
+    "carton_peleon": "El Cartón Peleón · Tienda online",
 }
 TCG_COLORS = {"one_piece": 0xE75B56, "pokemon": 0xF2C94C}
 REGION_LABELS = {"EU": "Europa", "ES": "España", "US": "Estados Unidos", "NA": "Norteamérica",

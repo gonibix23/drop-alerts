@@ -130,6 +130,10 @@ include_collectibles = false
 enabled = true
 interval_seconds = 300
 
+[sources.carton_peleon]
+enabled = true
+interval_seconds = 300
+
 # Los filtros de una regla se combinan con AND; valores dentro de un filtro, OR.
 # Una lista vacía no restringe ese campo. Al menos una regla debe coincidir.
 [[rules]]
@@ -198,6 +202,13 @@ require_analysis = false
 [[rules]]
 id = "zial-drops"
 sources = ["zial_tcg"]
+kinds = ["product", "collection"]
+event_types = ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]
+require_analysis = false
+
+[[rules]]
+id = "carton-peleon-drops"
+sources = ["carton_peleon"]
 kinds = ["product", "collection"]
 event_types = ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]
 require_analysis = false

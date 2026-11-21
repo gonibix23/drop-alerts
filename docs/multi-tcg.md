@@ -2,7 +2,7 @@
 
 Drop Alerts identifica cada elemento por su fuente e identidad estable y añade un perfil de juego, región, idioma de la fuente y canal. La cobertura implementada incluye `magic`, `one_piece` y `pokemon`. Los productos, anuncios y torneos comparten persistencia y reglas, pero conservan estados y fechas propios.
 
-La configuración predeterminada activa **18 fuentes de las 30 registradas**: siete de Magic, dos de One Piece, dos de Pokémon, tres de torneos locales y cuatro tiendas online. Los adaptadores usan HTTP y contenido público estructurado o HTML, sin navegador ni otro contenedor. Esta guía describe la cobertura configurada; las comprobaciones y sus límites se documentan en [verificación](verification.md).
+La configuración predeterminada activa **19 fuentes de las 31 registradas**: siete de Magic, dos de One Piece, dos de Pokémon, tres de torneos locales y cinco tiendas online. Los adaptadores usan HTTP y contenido público estructurado o HTML, sin navegador ni otro contenedor. Esta guía describe la cobertura configurada; las comprobaciones y sus límites se documentan en [verificación](verification.md).
 
 ## Fuentes activadas por defecto
 
@@ -26,6 +26,7 @@ La configuración predeterminada activa **18 fuentes de las 30 registradas**: si
 | Tienda | `jjcollection` | [JJ Collection](https://www.jjcollection.es/): productos y cartas por variante, reservas, stock y precios | 5 min |
 | Tienda | `animefan` | [Animefan](https://animefan.es/): cartas TCG, reservas y reposiciones; figuras y coleccionables opcionales | 5 min |
 | Tienda | `zial_tcg` | [Zial TCG](https://www.zialtcg.com/): cartas, preventas y accesorios; revisión explícita del display Commander Warhammer 40K enlazado | 5 min |
+| Tienda | `carton_peleon` | [El Cartón Peleón](https://www.elcartonpeleon.com/): productos y accesorios TCG; revisión explícita del pack Commander Warhammer 40K enlazado | 5 min |
 
 Cada fuente usa su `interval_seconds` del ejemplo; si no lo declara, sigue `POLL_INTERVAL_SECONDS`. Las tiendas online tienen un intervalo propio inicial de 300 segundos. Las consultas y los detalles tienen límites de tiempo, tamaño y número de elementos. Las ventanas rotan para revisar contenido conocido y nuevo: no se promete descubrir toda una hemeroteca en una sola comprobación.
 
@@ -34,6 +35,8 @@ Los adaptadores y reglas de Magic mantienen su funcionamiento anterior. El perfi
 Las tiendas tienen perfil mixto y sus productos identificados respetan `ENABLED_TCGS`. Se pueden seleccionar también Riftbound, Lorcana, Dragon Ball y otros juegos que aparezcan explícitamente en las fichas. Los accesorios generales de cartas pueden no tener juego asignado. La [guía de tiendas](retail-stores.md) explica la cobertura y las limitaciones de la revisión por ventanas. En Animefan se pueden activar [figuras y coleccionables](animefan.md) como ámbito independiente, con `include_collectibles=true`; no usan una etiqueta TCG por compartir una franquicia.
 
 Zial TCG utiliza los catálogos de juegos de cartas, preventa y accesorios, con una ventana de detalles y revisión de productos conocidos. El display Commander Warhammer 40K se consulta en cada ronda, incluso si deja de aparecer en esas páginas. La [guía de Zial](zial.md) explica cómo una preventa conserva `UPCOMING` aunque la ficha permita reservar unidades. Para recibir también los productos Gundam o Jurassic Park TCG identificados, añade `gundam` o `jurassic_park` a `ENABLED_TCGS`; los tres juegos predeterminados siguen siendo Magic, One Piece y Pokémon.
+
+El Cartón Peleón mantiene también una revisión expresa del pack Commander Warhammer 40K aportado. Sus productos respetan la selección de juegos y conservan su propia disponibilidad y precio, aunque otra tienda venda un artículo con el mismo nombre. La API pública de lectura de la propia web puede corroborar stock incierto o comprobar un bloqueo de venta cuando falta precio verificable, validando la plantilla y la variante. Un botón de compra o `InStock` genérico no bastan; los avisos explícitos de próxima reserva o agotado se conservan. El resultado refleja disponibilidad online y no acredita existencias en una tienda física. Palworld, UniVersus y Weiß Schwarz tienen etiquetas opcionales `palworld`, `universus` y `weiss_schwarz`, que puedes añadir a la selección. La [guía de El Cartón Peleón](carton-peleon.md) detalla la configuración, el alcance y los límites de la fuente.
 
 ## Fuentes opcionales
 

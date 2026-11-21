@@ -77,6 +77,7 @@ class Settings:
         "jjcollection": {"enabled": True, "interval_seconds": 300},
         "animefan": {"enabled": True, "interval_seconds": 300, "include_collectibles": False},
         "zial_tcg": {"enabled": True, "interval_seconds": 300},
+        "carton_peleon": {"enabled": True, "interval_seconds": 300},
     })
     rules: list[dict] = field(default_factory=lambda: [
         {"id": "store", "sources": ["secret_lair_eu"]},
@@ -92,6 +93,8 @@ class Settings:
         {"id": "animefan-drops", "sources": ["animefan"], "kinds": ["product", "collection"],
          "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
         {"id": "zial-drops", "sources": ["zial_tcg"], "kinds": ["product", "collection"],
+         "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
+        {"id": "carton-peleon-drops", "sources": ["carton_peleon"], "kinds": ["product", "collection"],
          "event_types": ["product.new", "collection.new", "availability.changed", "price.changed", "release_date.changed", "change.uncertain"]},
     ])
 

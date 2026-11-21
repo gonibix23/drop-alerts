@@ -6,6 +6,8 @@ La versión 1.4.1 añade también `animefan`, con el mismo intervalo y seguimien
 
 La versión 1.4.2 incorpora Zial TCG mediante `zial_tcg`, con el mismo intervalo y alcance de cartas y accesorios TCG. Además de recorrer sus listados por ventanas, revisa en cada ronda el producto Commander Warhammer 40K enlazado. Su [guía de configuración](zial.md) contiene los bloques para actualizar un TOML propio.
 
+La versión 1.4.3 añade El Cartón Peleón como `carton_peleon`, también con rondas cada 300 segundos y alcance limitado a productos TCG y accesorios. El pack Commander Warhammer 40K aportado se consulta en cada ronda. Su [guía de configuración](carton-peleon.md) contiene los bloques de fuente y regla.
+
 ## Qué se consulta
 
 | Fuente | Método ligero | Cobertura |
@@ -14,10 +16,11 @@ La versión 1.4.2 incorpora Zial TCG mediante `zial_tcg`, con el mismo intervalo
 | [JJ Collection](https://www.jjcollection.es/) | Sitemaps públicos y fichas HTML de Shopify, con ofertas JSON-LD y metadatos de cada variante | Productos, cartas y accesorios TCG; cada variante mantiene precio y disponibilidad propios. |
 | [Animefan](https://animefan.es/) | Categorías públicas y fichas de WooCommerce contrastadas con sus metadatos | Cartas y productos TCG; figuras y coleccionables solo si se activa su opción. |
 | [Zial TCG](https://www.zialtcg.com/) | Catálogos HTML WooCommerce y fichas principales contrastadas con Product/Offer JSON-LD | Juegos de cartas, preventas y accesorios; el display Commander Warhammer 40K enlazado se revisa cada ronda. |
+| [El Cartón Peleón](https://www.elcartonpeleon.com/) | HTML de Odoo y consulta pública de lectura para corroborar stock o bloqueo de venta; identidad de plantilla y variante validadas | Productos y accesorios TCG; el pack Commander Warhammer 40K enlazado se revisa cada ronda. |
 
-Los métodos y respuestas reales comprobados el **19 de noviembre de 2026** están en los estudios de [Tabletop](research-tabletop.md), [JJ Collection](research-jjcollection.md), [Animefan](research-animefan.md) y [Zial TCG](research-zial.md). No se usan cuentas, APIs privadas, carrito, navegadores ni acciones de compra. Las rutas restringidas en los robots examinados se evitan.
+La procedencia, los métodos y las fechas de comprobación se detallan en los estudios de [Tabletop](research-tabletop.md), [JJ Collection](research-jjcollection.md), [Animefan](research-animefan.md), [Zial TCG](research-zial.md) y [El Cartón Peleón](research-carton-peleon.md). No se usan cuentas, APIs privadas, carrito, navegadores ni acciones de compra. Las rutas restringidas en los robots examinados se evitan.
 
-Cada ronda visita un número acotado de páginas y detalles. Parte del presupuesto busca identidades nuevas y otra parte rota los productos ya conocidos, incluidos los agotados, para detectar reposiciones aunque salgan de portada. Los cursores persisten tras reinicios. **Cinco minutos es el intervalo entre rondas, no una garantía de revisar todas las fichas cada cinco minutos.** El tiempo de revisión completa depende del catálogo, sus cambios y los errores de red. No se promete cobertura completa de todo el archivo ni detectar una venta que se agote entre dos consultas.
+Cada ronda visita un número acotado de páginas y detalles. Parte del presupuesto busca identidades nuevas y otra parte rota los productos ya conocidos, incluidos los agotados, para detectar reposiciones cuando haya indicadores públicos verificables, aunque salgan de portada. Los cursores persisten tras reinicios. **Cinco minutos es el intervalo entre rondas, no una garantía de revisar todas las fichas cada cinco minutos.** El tiempo de revisión completa depende del catálogo, sus cambios y los errores de red. No se promete cobertura completa de todo el archivo ni detectar una venta que se agote entre dos consultas.
 
 ## Qué significa la disponibilidad
 
@@ -25,6 +28,8 @@ Cada ronda visita un número acotado de páginas y detalles. Parte del presupues
 - `UNAVAILABLE`: la fuente indica expresamente agotado o sin existencias.
 - `UPCOMING`: reserva o preventa expresamente identificada. Poder reservar no confirma stock para entrega inmediata.
 - Información incompleta o contradictoria: se conserva el último estado correcto cuando no se puede extraer la ficha con seguridad. Un error, una ficha eliminada o salir de un listado no convierte automáticamente el producto en agotado.
+
+En El Cartón Peleón, los bloques propios de agotado o de próxima reserva aportan estados explícitos. La API pública de lectura puede corroborar un stock incierto o comprobar si una ficha aparentemente disponible está bloqueada para vender por falta de precio verificable. Se validan el producto y su variante. El botón de compra y un `InStock` genérico en metadatos no bastan. El precio sólo se toma de información pública visible y el stock online no garantiza disponibilidad en una tienda física. Consulta [sus límites de disponibilidad](carton-peleon.md).
 
 El precio es el de la oferta actual comprobada, en EUR; los importes tachados y los rangos no se toman como precio de compra de una variante. No incluye un cálculo personalizado de envío, descuentos por cliente o condiciones del carrito. Los enlaces e imágenes proceden de orígenes permitidos de cada tienda. La fecha publicada de salida conserva su incertidumbre; no se infiere disponibilidad por haber llegado ese día.
 
@@ -37,7 +42,7 @@ En JJ Collection, una variante española agotada y otra inglesa disponible son e
 Se mantienen los juegos seleccionados por `ENABLED_TCGS` o `[games].enabled`. Con el valor inicial se avisa de Magic, One Piece y Pokémon. Para recibir también otros juegos identificados explícitamente en las fichas, amplía la lista, por ejemplo:
 
 ```dotenv
-ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,digimon,yugioh,star_wars_unlimited,cyberpunk,gundam,jurassic_park
+ENABLED_TCGS=magic,one_piece,pokemon,riftbound,lorcana,dragon_ball,digimon,yugioh,star_wars_unlimited,cyberpunk,gundam,jurassic_park,palworld,universus,weiss_schwarz
 ```
 
 Las etiquetas adicionales permiten filtrar productos de las tiendas; no crean adaptadores de anuncios oficiales de esos juegos. La clasificación usa título y categorías del producto, nunca los menús generales de la web. Los accesorios generales para cartas pueden no tener un juego asignado y se permiten mediante la regla de tiendas. Las tarjetas regalo y entradas de torneo quedan fuera del seguimiento comercial. Tabletop y JJ Collection excluyen figuras sueltas; Animefan permite activarlas con `include_collectibles=true`, sin etiquetarlas como TCG ni vincularlas a `ENABLED_TCGS`.
@@ -79,7 +84,7 @@ require_analysis = false
 
 Intégralos en tu archivo existente sin duplicar identificadores. Comprueba los logs y `python -m drop_alerts status` en el contenedor. No hacen falta variables nuevas para activar estas fuentes si utilizas la configuración incluida en la imagen.
 
-Animefan y Zial TCG tienen sus propios bloques de fuente y regla. Si tu TOML es anterior a su incorporación, añade los ejemplos de [Animefan](animefan.md) y [Zial TCG](zial.md); actualizar la imagen no los introduce automáticamente en un archivo montado.
+Animefan, Zial TCG y El Cartón Peleón tienen sus propios bloques de fuente y regla. Si tu TOML es anterior a su incorporación, añade los ejemplos de [Animefan](animefan.md), [Zial TCG](zial.md) y [El Cartón Peleón](carton-peleon.md); actualizar la imagen no los introduce automáticamente en un archivo montado.
 
 ## Consultar y probar un mensaje
 
@@ -92,6 +97,7 @@ python -m drop_alerts preview --source tabletop_gamers --kind product
 python -m drop_alerts preview --source jjcollection --kind product
 python -m drop_alerts preview --source animefan --kind product
 python -m drop_alerts preview --source zial_tcg --kind product
+python -m drop_alerts preview --source carton_peleon --kind product
 ```
 
 `preview` imprime el mensaje. Añade `--send` para enviarlo expresamente al webhook configurado, con la marca de vista previa manual. No modifica la deduplicación ni la cola. La consulta incluye los eventos conservados del arranque silencioso y respeta los juegos, fuentes y reglas actuales. Espera a la primera comprobación correcta si todavía no hay resultados. Véase [la guía de inspección](inspecting-alerts.md).

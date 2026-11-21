@@ -10,6 +10,7 @@ from .sources.tabletop import TabletopGamersSource
 from .sources.jjcollection import JJCollectionSource
 from .sources.animefan import AnimefanSource
 from .sources.zial import ZialTCGSource
+from .sources.carton_peleon import CartonPeleonSource
 from .profiles import SOURCE_PROFILES
 
 
@@ -55,6 +56,7 @@ SOURCE_FACTORIES = {
     "animefan": lambda settings, store: AnimefanSource(max_items=min(12, settings.source_max_items),
         include_collectibles=settings.sources["animefan"].get("include_collectibles", False)),
     "zial_tcg": lambda settings, store: ZialTCGSource(max_items=min(12, settings.source_max_items)),
+    "carton_peleon": lambda settings, store: CartonPeleonSource(max_items=min(12, settings.source_max_items)),
 }
 
 

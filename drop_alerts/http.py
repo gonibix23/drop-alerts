@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import math
 import time
 from collections import OrderedDict
@@ -12,7 +13,7 @@ from urllib.parse import urljoin, urlsplit
 
 import httpx
 
-from .models import ExtractionError, safe_url
+from .models import ExtractionError, safe_url, canonical_json
 
 
 class SourceHTTP:
@@ -32,14 +33,62 @@ class SourceHTTP:
         try:
             # A slowly trickling body cannot hold the worker forever.
             async with asyncio.timeout(self.timeout * (self.retries + 1)):
-                return await self._get(url)
+                return await self._request(url)
         except TimeoutError:
             raise ExtractionError("Tiempo total de consulta agotado") from None
 
-    async def _get(self, url: str, redirects: int = 0) -> str:
+    async def post_json(self, url: str, payload: dict) -> dict:
+        """Query a verified public read-only RPC; never cache or follow redirects.
+
+        Adapters own the fixed endpoint and response schema. They must not use
+        this transport for cart, checkout or other state-changing operations.
+        Request slots, cooldowns, response limits and retries are shared with GET.
+        """
+        try:
+            if not isinstance(payload, dict):
+                raise ValueError("Objeto requerido")
+            encoded = canonical_json(payload).encode("utf-8")
+            if len(encoded) > 65536:
+                raise ValueError("Consulta demasiado grande")
+        except (TypeError, ValueError, RecursionError, OverflowError):
+            raise ExtractionError("Consulta JSON no válida") from None
+        try:
+            async with asyncio.timeout(self.timeout * (self.retries + 1)):
+                body = await self._request(url, method="POST", request_body=encoded)
+        except TimeoutError:
+            raise ExtractionError("Tiempo total de consulta agotado") from None
+
+        def object_pairs(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError("Clave duplicada")
+                result[key] = value
+            return result
+
+        def invalid_constant(value):
+            raise ValueError("Número JSON no válido")
+
+        def finite_float(value):
+            number = float(value)
+            if not math.isfinite(number):
+                raise ValueError("Número JSON fuera de rango")
+            return number
+
+        try:
+            result = json.loads(body, object_pairs_hook=object_pairs, parse_constant=invalid_constant, parse_float=finite_float)
+            if not isinstance(result, dict):
+                raise ValueError("Objeto requerido")
+            return result
+        except (ValueError, TypeError, RecursionError):
+            raise ExtractionError("Respuesta JSON no válida") from None
+
+    async def _request(self, url: str, redirects: int = 0, *, method: str = "GET", request_body: bytes | None = None) -> str:
         url = safe_url(url)
-        cached = self.store.get_http_cache(url) if self.store else self._cache.get(url)
-        headers = {"User-Agent": "drop-alerts/1.4.2 (self-hosted source monitoring)"}
+        cached = (self.store.get_http_cache(url) if self.store else self._cache.get(url)) if method == "GET" else None
+        headers = {"User-Agent": "drop-alerts/1.4.3 (self-hosted source monitoring)"}
+        if method == "POST":
+            headers.update({"Content-Type": "application/json", "Accept": "application/json"})
         if cached:
             if cached.get("etag"):
                 headers["If-None-Match"] = cached["etag"]
@@ -60,15 +109,20 @@ class SourceHTTP:
                 self._last_request[host] = time.monotonic()
             try:
                 # Follow only bounded same-origin redirects, checked before each request.
-                async with self.client.stream("GET", url, headers=headers, follow_redirects=False,
-                                              timeout=self.timeout) as response:
+                options = {"content": request_body} if request_body is not None else {}
+                async with self.client.stream(method, url, headers=headers, follow_redirects=False,
+                                              timeout=self.timeout, **options) as response:
                     if response.status_code in (301, 302, 303, 307, 308):
+                        if method != "GET":
+                            raise ExtractionError("Redirección de consulta JSON no permitida")
                         destination = safe_url(urljoin(url, response.headers.get("Location", "")))
                         old_parts, new_parts = urlsplit(url), urlsplit(destination)
                         if redirects >= 3 or (new_parts.scheme, new_parts.netloc) != (old_parts.scheme, old_parts.netloc):
                             raise ExtractionError("Redirección de fuente no permitida")
-                        return await self._get(destination, redirects + 1)
+                        return await self._request(destination, redirects + 1)
                     if response.status_code == 304:
+                        if method != "GET":
+                            raise ExtractionError("Respuesta 304 no válida para consulta JSON")
                         if cached and isinstance(cached.get("body"), str):
                             return cached["body"]
                         raise ExtractionError("Respuesta 304 sin contenido previo")
@@ -112,12 +166,13 @@ class SourceHTTP:
                               "last_modified": response.headers.get("Last-Modified")}
                     # Cache is transport data, never an accepted source snapshot.
                     # An invalid cached response still fails parsing on the next 304.
-                    if self.store:
-                        self.store.set_http_cache(url, **record)
-                    else:
-                        self._cache[url] = record
-                        while len(self._cache) > 128:
-                            self._cache.popitem(last=False)
+                    if method == "GET":
+                        if self.store:
+                            self.store.set_http_cache(url, **record)
+                        else:
+                            self._cache[url] = record
+                            while len(self._cache) > 128:
+                                self._cache.popitem(last=False)
                     return body
             except httpx.TransportError:
                 if attempt >= self.retries:

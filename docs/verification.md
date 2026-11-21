@@ -2,6 +2,18 @@
 
 El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts). Las comprobaciones se detallan por versión y fecha.
 
+## Actualización 1.4.3: El Cartón Peleón (21/11/2026)
+
+- `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-carton-release-final`: **918 pruebas aprobadas**, Python 3.14 en Windows. Se completaron también compilación de módulos, `pip check`, validación del Compose y revisión de formato.
+- Consulta real de `carton_peleon` con `SourceHTTP`, HTTPS/TLS verificado y SQLite en memoria: **12 fichas y cuatro páginas**, sin errores parciales. El arranque silencioso dejó **0 notificaciones pendientes** y repetir los resultados produjo **0 eventos nuevos**. La ventana reciente consultada contenía productos próximos y no representa todo el catálogo.
+- El pack Warhammer solicitado quedó como plantilla `19822`, variante `23219`, `UPCOMING`: **próximamente disponible para reservar**. Se visita primero en cada ronda. El precio cero de metadatos, el importe oculto de edición y la fecha estimada contradictoria no se presentan como precio o fecha confirmados.
+- Se verificó por separado una ficha normal con HTML de stock insuficiente: la RPC pública de lectura de combinaciones devolvió las identidades y existencias de esa variante. Mediante `SourceHTTP.post_json` pasó de `UNKNOWN` a `AVAILABLE`, conservando el precio público visible y corroborado. No se usa el precio de la API ni se realizan acciones de carrito o compra.
+- Las **63 pruebas del adaptador** reproducen HTML/JSON guardados, identidades de plantilla y variante, precio oculto, stock online frente a tienda física, reservas, errores de RPC, bloqueo de venta, límites y referencia inicial diferida. Las pruebas del transporte comprueban que las consultas JSON comparten las pausas y reintentos HTTP, rechazan respuestas ambiguas y no cachean stock ni siguen redirecciones; la compatibilidad de GET y su caché también pasó.
+- Se conservan SQLite 2, volumen, dependencias y ausencia de puertos publicados. Hay **19 fuentes activas y 31 registradas**. Los nuevos identificadores opcionales `palworld`, `universus` y `weiss_schwarz` respetan la selección de juegos; los tres juegos iniciales siguen siendo los predeterminados.
+- Las verificaciones utilizaron estado temporal, IA desactivada y ningún webhook. No se accedió a Portainer ni se envió un mensaje real. La construcción y ejecución de cada revisión se consultan en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions); el motor Docker local no estaba disponible. Las capturas completas están en `work/research/carton-peleon/`, excluido de Git.
+
+Consulta [la guía de El Cartón Peleón](carton-peleon.md) y [la investigación de la fuente](research-carton-peleon.md). Las verificaciones siguientes son históricas.
+
 ## Actualización 1.4.2: Zial TCG y producto enlazado (19/11/2026)
 
 - `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-zial-final`: **829 pruebas aprobadas**, Python 3.14 en Windows. `compileall`, `pip check`, la validación del Compose y la revisión de formato terminaron correctamente.
