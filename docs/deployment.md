@@ -14,7 +14,7 @@ Para utilizar Docker Compose desde una terminal, autentica Git para leer el repo
 git clone https://github.com/gonibix23/drop-alerts.git
 cd drop-alerts
 cp .env.example .env
-# Editar .env y configurar DISCORD_WEBHOOK_URL.
+# Editar .env y configurar el webhook general o los webhooks por juego.
 docker compose up -d --build
 ```
 
@@ -31,12 +31,30 @@ El 21 de octubre de 2026 se completó una descarga de las dependencias de ejecuc
 1. En Portainer selecciona el endpoint Docker adecuado.
 2. Abre **Stacks → Add stack**, escribe `drop-alerts` y elige **Repository**.
 3. Selecciona o configura el repositorio privado `https://github.com/gonibix23/drop-alerts.git`, la referencia `refs/heads/main` y la ruta de Compose `docker-compose.yml`. Utiliza tus credenciales Git o una fuente Git ya configurada.
-4. Añade las variables de `.env.example` en **Environment variables** o carga un archivo `.env` local si tu versión ofrece esa opción. Como mínimo configura `DISCORD_WEBHOOK_URL`. Elimina la variable antigua `DROP_ALERTS_IMAGE` si sigue presente.
+4. Añade las variables de `.env.example` en **Environment variables** o carga un archivo `.env` local si tu versión ofrece esa opción. Configura `DISCORD_WEBHOOK_URL` o los webhooks específicos por juego que se explican a continuación. Elimina la variable antigua `DROP_ALERTS_IMAGE` si sigue presente.
 5. Revisa `LLM_BASE_URL` y `LLM_MODEL`; añade `LLM_API_KEY` solamente si el servidor la exige.
 6. Pulsa **Deploy the stack**. No necesitas puertos publicados ni otro servicio.
 7. Abre **Containers → drop-alerts → Logs** y comprueba el estado de salud.
 
 El volumen se llama normalmente `<nombre_del_stack>_drop_alerts_data`. No borres el volumen al recrear o actualizar el stack. El primer arranque registra la situación actual silenciosamente. `BOOTSTRAP_MODE=notify` permite avisar también de los elementos presentes en la primera comprobación; puede generar muchas notificaciones.
+
+### Canales de Discord por juego
+
+En Discord, abre **Ajustes del servidor → Integraciones → Webhooks**, crea tres webhooks entrantes y selecciona un canal diferente para cada uno. Copia cada URL en su variable de **Environment variables** del stack en Portainer:
+
+| Juego | Variable |
+| --- | --- |
+| Magic, incluido Secret Lair | `DISCORD_WEBHOOK_URL_MAGIC` |
+| One Piece | `DISCORD_WEBHOOK_URL_ONE_PIECE` |
+| Pokémon | `DISCORD_WEBHOOK_URL_POKEMON` |
+
+No se configuran nombres ni identificadores de canal: cada URL ya pertenece al canal elegido en Discord. Las alertas usan el juego identificado del evento, incluidas las procedentes de tiendas multijuego o calendarios locales. Si no hay webhook específico, se utiliza `DISCORD_WEBHOOK_URL`. El general recibe también accesorios sin juego identificado y otros juegos; puedes conservarlo como cuarto canal de respaldo. Cada alerta se entrega a un solo destino, sin copia adicional al general. Si solo configuras los tres específicos, los eventos sin destino aplicable quedan pendientes hasta configurar el general.
+
+Los reintentos y pausas se conservan tras reiniciar. Un límite de frecuencia de un webhook permite seguir enviando por los otros; un límite global de Discord pausa todos. Compartir la misma URL entre juegos comparte también su pausa.
+
+Para actualizar un stack existente, añade las variables, obtén `main` mediante **Pull and redeploy** y reconstruye la imagen con el Compose actualizado. Conserva el volumen `drop_alerts_data` y `BOOTSTRAP_MODE=silent`; no hace falta cambiar las reglas ni el TOML para separar los canales. Los avisos ya enviados no se vuelven a enviar al cambiar el destino. Puedes probar cada canal desde la consola del contenedor con `python -m drop_alerts preview --tcg magic --send`, sustituyendo `magic` por `one_piece` o `pokemon`; debe existir un evento guardado del juego elegido. La prueba manual usa el mismo enrutamiento que el servicio.
+
+Las tres variables admiten también `DISCORD_WEBHOOK_URL_MAGIC_FILE`, `DISCORD_WEBHOOK_URL_ONE_PIECE_FILE` y `DISCORD_WEBHOOK_URL_POKEMON_FILE`. Monta cada archivo de secreto y deja vacía su variable directa correspondiente, como en el ejemplo de secretos más abajo. No publiques las URLs en el repositorio ni en capturas.
 
 ### Alternativa opcional: descargar la imagen de GHCR
 

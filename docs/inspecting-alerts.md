@@ -46,7 +46,7 @@ python -m drop_alerts preview --source tabletop_gamers --kind product --send
 python -m drop_alerts preview --source jjcollection --kind product --send
 ```
 
-`--send` hace **una petición** al webhook ya configurado, mediante `DISCORD_WEBHOOK_URL` o su archivo de secreto. El mensaje lleva la marca **VISTA PREVIA MANUAL** para distinguirlo de una nueva detección. No necesitas copiar el webhook en la consola ni incorporarlo al comando.
+`--send` hace **una petición** al webhook del juego del evento: `DISCORD_WEBHOOK_URL_MAGIC`, `DISCORD_WEBHOOK_URL_ONE_PIECE` o `DISCORD_WEBHOOK_URL_POKEMON` (o su alternativa `_FILE`). Si no está configurado, utiliza `DISCORD_WEBHOOK_URL` como fallback; los eventos sin juego identificado u otros juegos también usan el general. Es la misma selección que en las entregas automáticas y no envía una copia adicional al general. Sin destino aplicable, la vista previa indica que falta configurar un webhook y no envía nada. El mensaje lleva la marca **VISTA PREVIA MANUAL** para distinguirlo de una nueva detección. No necesitas copiar el webhook en la consola ni incorporarlo al comando.
 
 La vista previa no cambia la cola, los intentos de entrega, el historial de notificaciones ni la deduplicación. Tampoco marca el evento como enviado. Si pruebas un evento pendiente, el monitor conserva su entrega normal; repetir `--send` vuelve a enviar expresamente una vista previa. Si todas las reglas coincidentes exigen análisis, el evento solo puede seleccionarse cuando lo tenga guardado; la prueba manual no evita esa condición.
 

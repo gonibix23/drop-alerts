@@ -2,6 +2,16 @@
 
 El proyecto utiliza la rama `main` y su repositorio de GitHub es privado: [gonibix23/drop-alerts](https://github.com/gonibix23/drop-alerts). Las comprobaciones se detallan por versión y fecha.
 
+## Actualización 1.5.0: canales de Discord por juego (27/11/2026)
+
+- `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-discord-routing-release`: **975 pruebas aprobadas**, Python 3.14 en Windows. También pasaron `compileall`, `pip check`, `docker compose config --quiet` y la revisión de formato.
+- Nuevas variables opcionales `DISCORD_WEBHOOK_URL_MAGIC`, `DISCORD_WEBHOOK_URL_ONE_PIECE` y `DISCORD_WEBHOOK_URL_POKEMON`, con alternativas `_FILE`. El webhook general sigue siendo compatible. El específico tiene prioridad y cada evento utiliza un único destino; el modelo y el título no eligen el canal.
+- Las pruebas con HTTP simulado verifican selección por fuente o juego, tiendas multijuego, alias, fallback, tres destinos sin general, vistas previas, fallos aislados, deduplicación tras reiniciar y configuración de secretos sin exponerlos. Un destino ausente conserva la entrega pendiente sin gastar intentos.
+- Las pausas por webhook se guardan por una huella de su identidad, sin almacenar su URL secreta en metadatos. Dos juegos con la misma URL comparten pausa; un límite local no frena los otros destinos y un límite global sí. Las comprobaciones cubren reinicios y límites indicados tanto en cuerpo como en cabeceras.
+- Se conserva SQLite 2, el volumen, el proceso único y las dependencias existentes. No se envió ningún mensaje real, no se consultó el modelo ni se accedió a Portainer. La construcción y ejecución de la revisión se consultan en [GitHub Actions](https://github.com/gonibix23/drop-alerts/actions).
+
+La [guía de despliegue](deployment.md#canales-de-discord-por-juego) explica las variables del stack y cómo probar cada canal.
+
 ## Actualización 1.4.3: El Cartón Peleón (21/11/2026)
 
 - `python -m pytest -q -p no:cacheprovider --basetemp work/pytest-carton-release-final`: **918 pruebas aprobadas**, Python 3.14 en Windows. Se completaron también compilación de módulos, `pip check`, validación del Compose y revisión de formato.

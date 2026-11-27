@@ -18,14 +18,14 @@ Para desplegar desde una terminal en el equipo que ejecuta Docker —la VM o el 
 git clone https://github.com/gonibix23/drop-alerts.git
 cd drop-alerts
 cp .env.example .env
-# Editar .env y configurar DISCORD_WEBHOOK_URL.
+# Editar .env y configurar el webhook general o los webhooks por juego.
 docker compose up -d --build
 docker compose logs --tail=100 -f
 ```
 
 La primera comprobación correcta de cada fuente establece una referencia silenciosa (`BOOTSTRAP_MODE=silent`). Las siguientes comprobaciones generan eventos por novedades y cambios reales. Un fallo de extracción conserva el estado anterior; que un producto no aparezca en una lista no demuestra que esté agotado.
 
-Para Portainer, usa el repositorio `https://github.com/gonibix23/drop-alerts.git`, configura `DISCORD_WEBHOOK_URL` en las variables del stack y despliega. El modo Repository obtiene el Dockerfile y el código necesarios para construir; pegar solamente el YAML en Web editor no aporta esos archivos. La variable antigua `DROP_ALERTS_IMAGE` ya no se utiliza en el Compose predeterminado y puedes eliminarla. La imagen privada de GHCR se conserva como alternativa opcional; el procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
+Para Portainer, usa el repositorio `https://github.com/gonibix23/drop-alerts.git`, configura el webhook general o los webhooks por juego en las variables del stack y despliega. El modo Repository obtiene el Dockerfile y el código necesarios para construir; pegar solamente el YAML en Web editor no aporta esos archivos. La variable antigua `DROP_ALERTS_IMAGE` ya no se utiliza en el Compose predeterminado y puedes eliminarla. La imagen privada de GHCR se conserva como alternativa opcional; el procedimiento completo, actualización y copias de seguridad están en [la guía de despliegue](docs/deployment.md).
 
 Para actualizar un stack existente en Portainer, abre el stack creado desde Repository y utiliza **Pull and redeploy** para obtener `main`, con reconstrucción de la imagen desde `docker-compose.yml`. Conserva el volumen `drop_alerts_data`: la ampliación a varios TCG mantiene el esquema SQLite 2 y las identidades anteriores de Magic. Mantén `BOOTSTRAP_MODE=silent`; cada fuente nueva establece su referencia sin avisos históricos. Si montas un TOML antiguo, incorpora los nuevos bloques de fuentes y reglas desde el ejemplo: ese archivo sustituye las listas predeterminadas, y una fuente ausente no se activa automáticamente.
 
@@ -53,6 +53,8 @@ Las tres fuentes locales cubren inicialmente **ocho tiendas**. El [inventario de
 
 Las tarjetas de Discord muestran juego, región, idioma de la fuente, canal, tipo de evento, título enlazado y una imagen cuando procede de la fuente. Los anuncios de One Piece para Occidente incluyen Europa, pero un MSRP en dólares no se presenta como precio europeo. Las noticias de Pokémon en español tienen alcance global: el idioma no demuestra stock en España. Los mercados de Japón y Estados Unidos permanecen separados. Un anuncio no prueba que un producto ya esté a la venta. Las menciones están desactivadas.
 
+Puedes usar tres canales distintos creando un webhook entrante en cada canal de Discord y configurando `DISCORD_WEBHOOK_URL_MAGIC`, `DISCORD_WEBHOOK_URL_ONE_PIECE` y `DISCORD_WEBHOOK_URL_POKEMON`. Cada alerta usa el webhook del juego identificado, también en tiendas multijuego y torneos. Si falta el específico, utiliza `DISCORD_WEBHOOK_URL`; ese webhook general también recibe contenido sin juego identificado u otros juegos. No se envía una segunda copia al general. Si no existe destino aplicable, la entrega queda pendiente. Las cuatro variables admiten su alternativa `_FILE` para secretos montados. Consulta [la configuración en Portainer](docs/deployment.md#canales-de-discord-por-juego).
+
 Puedes abrir la [vista previa multijuego](docs/multi-tcg-preview.html) o consultar su [JSON de ejemplo](docs/examples/multi-tcg-discord.json). Los ejemplos son ficticios y no envían mensajes.
 
 El servicio intenta obtener la **fecha prevista de venta, preventa o lanzamiento** a partir del anuncio y mostrarla separada de cuándo fue detectado. Convierte la hora a la zona configurada —Madrid por defecto— solo cuando hay una zona horaria respaldada por la fuente, marca las fechas orientativas y avisa de los cambios de fecha. Si no hay datos suficientes, muestra «Sin fecha confirmada». Los torneos muestran su horario, tienda y tarifa de inscripción por separado; un período de evento no se convierte en fecha de venta. Consulta [cómo se extraen y validan las fechas](docs/release-dates.md) y [los límites de los calendarios](docs/multi-tcg.md#torneos-y-tiendas-locales).
@@ -70,7 +72,7 @@ python -m drop_alerts preview --tcg one_piece --kind event
 python -m drop_alerts preview --tcg pokemon --kind article --send
 ```
 
-`events` consulta eventos guardados; `preview` muestra el último mensaje que coincide. Solo `--send` envía una vista previa al webhook configurado, con la marca **VISTA PREVIA MANUAL**. No vuelve a consultar las webs, no llama al modelo ni cambia el historial o la deduplicación. También permite probar eventos registrados durante el arranque silencioso. Desde el host, antepón `docker compose exec drop-alerts`. La [guía de consultas y pruebas](docs/inspecting-alerts.md) explica los filtros y los errores de envío.
+`events` consulta eventos guardados; `preview` muestra el último mensaje que coincide. Solo `--send` envía una vista previa al webhook correspondiente al juego del evento, con la marca **VISTA PREVIA MANUAL**. Usa la misma selección de canal y fallback que los avisos automáticos. No vuelve a consultar las webs, no llama al modelo ni cambia el historial o la deduplicación. También permite probar eventos registrados durante el arranque silencioso. Desde el host, antepón `docker compose exec drop-alerts`. La [guía de consultas y pruebas](docs/inspecting-alerts.md) explica los filtros y los errores de envío.
 
 ## Modelo remoto
 
@@ -114,7 +116,7 @@ Los productos TCG de las tiendas respetan esa selección de juegos. Para recibir
 | Fuentes | `HTTP_TIMEOUT_SECONDS=20`, `HTTP_MAX_RETRIES=1`, `SOURCE_MAX_BYTES=2000000`, `SOURCE_MAX_ITEMS=100` |
 | IA | `LLM_ENABLED`, `LLM_BASE_URL`, `LLM_MODEL`, `LLM_API_KEY`/`LLM_API_KEY_FILE`, tiempo de espera, reintentos, temperatura, límites de entrada/salida y caché |
 | Cola IA | `MAX_PENDING_ANALYSES=100`, `ANALYSES_PER_TICK=4`, `ANALYSIS_MAX_ATTEMPTS=3` |
-| Discord | `DISCORD_WEBHOOK_URL`/`DISCORD_WEBHOOK_URL_FILE`, `NOTIFICATION_MAX_ATTEMPTS=12`, `NOTIFICATION_BATCH_SIZE=10` |
+| Discord | General: `DISCORD_WEBHOOK_URL`; por juego: `DISCORD_WEBHOOK_URL_MAGIC`, `DISCORD_WEBHOOK_URL_ONE_PIECE`, `DISCORD_WEBHOOK_URL_POKEMON`; alternativas `_FILE`; `NOTIFICATION_MAX_ATTEMPTS=12`, `NOTIFICATION_BATCH_SIZE=10` |
 
 La zona horaria controla la presentación de fechas. Las fechas de detección emplean UTC; los horarios de torneos conservan también la información temporal de la fuente. No configures varias réplicas contra la misma base de datos: este despliegue está pensado para una instancia.
 

@@ -10,6 +10,12 @@ from zoneinfo import ZoneInfo
 from .models import safe_url
 
 
+DISCORD_WEBHOOK_FIELDS = (
+    "discord_webhook_url", "discord_webhook_url_magic",
+    "discord_webhook_url_one_piece", "discord_webhook_url_pokemon",
+)
+
+
 def secret(env: Mapping[str, str], key: str) -> str:
     if env.get(key) and env.get(key + "_FILE"):
         raise ValueError(f"Configura {key} o {key}_FILE, solo uno")
@@ -21,6 +27,9 @@ def secret(env: Mapping[str, str], key: str) -> str:
 @dataclass(repr=False)
 class Settings:
     discord_webhook_url: str = ""
+    discord_webhook_url_magic: str = ""
+    discord_webhook_url_one_piece: str = ""
+    discord_webhook_url_pokemon: str = ""
     poll_interval_seconds: int = 300
     timezone: str = "Europe/Madrid"
     bootstrap_mode: str = "silent"
@@ -103,7 +112,7 @@ class Settings:
         env = os.environ if env is None else env
         result = cls()
         for name in result.__dataclass_fields__:
-            if name in ("sources", "rules", "discord_webhook_url", "llm_api_key", "enabled_tcgs"):
+            if name in ("sources", "rules", "llm_api_key", "enabled_tcgs") + DISCORD_WEBHOOK_FIELDS:
                 continue
             key = name.upper()
             if key not in env:
@@ -119,7 +128,8 @@ class Settings:
             elif isinstance(default, float):
                 value = float(value)
             setattr(result, name, value)
-        result.discord_webhook_url = secret(env, "DISCORD_WEBHOOK_URL")
+        for name in DISCORD_WEBHOOK_FIELDS:
+            setattr(result, name, secret(env, name.upper()))
         result.llm_api_key = secret(env, "LLM_API_KEY")
         if env.get("CONFIG_PATH"):
             with open(env["CONFIG_PATH"], "rb") as stream:
@@ -169,10 +179,20 @@ class Settings:
         from urllib.parse import urlsplit
         if urlsplit(self.llm_base_url).query:
             raise ValueError("LLM_BASE_URL no admite query")
-        if self.discord_webhook_url:
-            parts = urlsplit(safe_url(self.discord_webhook_url))
-            if parts.scheme != "https" or parts.hostname not in ("discord.com", "discordapp.com", "canary.discord.com", "ptb.discord.com") or not parts.path.startswith("/api/webhooks/"):
-                raise ValueError("DISCORD_WEBHOOK_URL debe ser un webhook HTTPS de Discord")
+        for name in DISCORD_WEBHOOK_FIELDS:
+            value = getattr(self, name)
+            if not value:
+                continue
+            try:
+                parts = urlsplit(safe_url(value))
+                valid = (parts.scheme == "https"
+                         and parts.hostname in ("discord.com", "discordapp.com", "canary.discord.com", "ptb.discord.com")
+                         and parts.path.startswith("/api/webhooks/")
+                         and not any(character.isspace() or ord(character) < 32 for character in value))
+            except (ValueError, TypeError):
+                valid = False
+            if not valid:
+                raise ValueError(f"{name.upper()} debe ser un webhook HTTPS de Discord") from None
         if not isinstance(self.sources, dict) or not isinstance(self.rules, list):
             raise ValueError("sources/rules inválidos")
         from .registry import SOURCE_FACTORIES

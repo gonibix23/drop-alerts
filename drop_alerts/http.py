@@ -86,7 +86,7 @@ class SourceHTTP:
     async def _request(self, url: str, redirects: int = 0, *, method: str = "GET", request_body: bytes | None = None) -> str:
         url = safe_url(url)
         cached = (self.store.get_http_cache(url) if self.store else self._cache.get(url)) if method == "GET" else None
-        headers = {"User-Agent": "drop-alerts/1.4.3 (self-hosted source monitoring)"}
+        headers = {"User-Agent": "drop-alerts/1.5.0 (self-hosted source monitoring)"}
         if method == "POST":
             headers.update({"Content-Type": "application/json", "Accept": "application/json"})
         if cached:

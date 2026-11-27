@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import random
 import re
 import time
@@ -11,8 +12,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
 
-from .models import Event, safe_url
-from .profiles import TCG_LABELS
+from .models import Event, fingerprint, safe_url
+from .profiles import TCG_LABELS, event_profile
 
 
 class DeliveryError(Exception):
@@ -408,18 +409,64 @@ def discord_payload(event: Event, timezone: str = "Europe/Madrid") -> dict:
     return {"allowed_mentions": {"parse": [], "users": [], "roles": [], "replied_user": False}, "embeds": [embed]}
 
 
+DISCORD_GAME_FIELDS = ("magic", "one_piece", "pokemon")
+
+
+def discord_webhook_url(settings, event: Event | None = None) -> str:
+    """Route using the adapter's game identity, never model output or message text."""
+    if event is not None:
+        game = event_profile(event.data["current"], event.source).get("tcg")
+        if game in DISCORD_GAME_FIELDS:
+            specific = getattr(settings, "discord_webhook_url_" + game, "")
+            if specific:
+                return specific
+    return settings.discord_webhook_url
+
+
 class DiscordChannel:
     def __init__(self, settings, store, client: httpx.AsyncClient):
         self.settings, self.store, self.client = settings, store, client
-        self.blocked_until = float(store.get_meta("discord_blocked_until") or 0)
+
+    def _deadline(self, key: str) -> float:
+        try:
+            value = float(self.store.get_meta(key) or 0)
+            return value if math.isfinite(value) else 0
+        except (TypeError, ValueError):
+            return 0
+
+    def _urls(self):
+        return {url for url in [self.settings.discord_webhook_url] +
+                [getattr(self.settings, "discord_webhook_url_" + game, "") for game in DISCORD_GAME_FIELDS] if url}
+
+    @staticmethod
+    def _bucket_key(url: str) -> str:
+        from urllib.parse import urlsplit
+        # Discord host aliases and optional query parameters share a webhook bucket.
+        # Only a digest is persisted; webhook tokens never become metadata keys.
+        return "discord_webhook_blocked_until:" + fingerprint(urlsplit(url).path.rstrip("/"))
+
+    @property
+    def blocked_until(self):
+        # Keep the legacy deadline as a global pause until it expires after upgrade.
+        global_deadline = self._deadline("discord_blocked_until")
+        all_blocked = min((self._deadline(self._bucket_key(url)) for url in self._urls()), default=0)
+        return max(global_deadline, all_blocked)
 
     @property
     def enabled(self):
-        return bool(self.settings.discord_webhook_url)
+        return bool(self._urls())
 
-    def block(self, delay: float):
-        self.blocked_until = max(self.blocked_until, time.time() + max(0, delay))
-        self.store.set_meta("discord_blocked_until", str(self.blocked_until))
+    def block(self, delay: float, *, webhook_url: str, global_limit: bool = False):
+        key = "discord_blocked_until" if global_limit else self._bucket_key(webhook_url)
+        deadline = max(self._deadline(key), time.time() + max(0, delay))
+        self.store.set_meta(key, str(deadline))
+
+    def delivery_delay(self, event: Event) -> float | None:
+        url = discord_webhook_url(self.settings, event)
+        if not url:
+            return None
+        return max(0, self._deadline("discord_blocked_until") - time.time(),
+                   self._deadline(self._bucket_key(url)) - time.time())
 
     async def send(self, event: Event):
         try:
@@ -429,29 +476,33 @@ class DiscordChannel:
             raise DeliveryError("discord_network", 30) from None
 
     async def _send(self, event: Event):
-        if not self.settings.discord_webhook_url:
+        url = discord_webhook_url(self.settings, event)
+        if not url:
             raise DeliveryError("webhook_not_configured", 300)
-        if self.blocked_until > time.time():
-            raise DeliveryError("discord_rate_limit", self.blocked_until - time.time())
+        delay = self.delivery_delay(event)
+        if delay:
+            raise DeliveryError("discord_rate_limit", delay)
         try:
-            async with self.client.stream("POST", self.settings.discord_webhook_url, params={"wait": "true"}, json=discord_payload(event, self.settings.timezone), timeout=self.settings.http_timeout_seconds, follow_redirects=False) as response:
+            async with self.client.stream("POST", url, params={"wait": "true"}, json=discord_payload(event, self.settings.timezone), timeout=self.settings.http_timeout_seconds, follow_redirects=False) as response:
                 body = bytearray()
                 async for chunk in response.aiter_bytes():
                     body.extend(chunk)
                     if len(body) > 32768:
                         raise DeliveryError("discord_response_too_large", 60)
                 if response.status_code == 429:
+                    global_limit = response.headers.get("x-ratelimit-global", "").lower() == "true"
                     try:
-                        delay = float(json.loads(body).get("retry_after", 1))
+                        limits = json.loads(body)
+                        global_limit = global_limit or limits.get("global") is True
+                        delay = float(limits.get("retry_after", 1))
                     except (ValueError, TypeError, AttributeError):
                         try:
                             delay = float(response.headers.get("retry-after", "1"))
                         except ValueError:
                             delay = 60
                     # Reject NaN/inf; a negative or huge server value must not busy-loop.
-                    import math
                     delay = max(1, min(delay, 86400)) if math.isfinite(delay) else 60
-                    self.block(delay)
+                    self.block(delay, webhook_url=url, global_limit=global_limit)
                     raise DeliveryError("discord_429", delay)
                 if response.status_code >= 500:
                     raise DeliveryError(f"discord_{response.status_code}", 60)
@@ -459,9 +510,10 @@ class DiscordChannel:
                     raise DeliveryError(f"discord_{response.status_code}", permanent=True)
                 if response.headers.get("x-ratelimit-remaining") == "0":
                     try:
-                        self.block(min(86400, max(1, float(response.headers.get("x-ratelimit-reset-after", "1")))))
+                        delay = float(response.headers.get("x-ratelimit-reset-after", "1"))
+                        self.block(min(86400, max(1, delay)) if math.isfinite(delay) else 60, webhook_url=url)
                     except ValueError:
-                        self.block(1)
+                        self.block(1, webhook_url=url)
         except httpx.HTTPError:
             raise DeliveryError("discord_network", 30) from None
 
@@ -515,6 +567,12 @@ class NotificationWorker:
                 if not self._configuration_allows(event, rules):
                     self.store.notification_skipped(event.id, "configuration_disabled")
                     continue
+                if hasattr(self.channel, "delivery_delay"):
+                    delay = self.channel.delivery_delay(event)
+                    if delay is None or delay > 0:
+                        self.store.notification_deferred(event.id, 300 if delay is None else delay,
+                                                         "webhook_not_configured" if delay is None else "discord_rate_limit")
+                        continue
                 remaining -= 1
                 try:
                     await self.channel.send(event)

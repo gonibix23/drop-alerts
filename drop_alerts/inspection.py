@@ -19,7 +19,7 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from .models import Event, safe_url
-from .notifications import discord_payload
+from .notifications import discord_payload, discord_webhook_url
 from .profiles import TCG_LABELS, event_profile, normalize_tcg, source_scope_enabled
 from .rules import RuleEngine
 
@@ -35,7 +35,7 @@ class InspectionError(Exception):
 ERROR_MESSAGES = {
     "database_missing": "La base de datos todavía no existe. Espera a la primera comprobación del servicio.",
     "database_unreadable": "No se pudo leer la base de datos. Revisa la ruta, los permisos y el estado del servicio.",
-    "webhook_missing": "Falta configurar DISCORD_WEBHOOK_URL o DISCORD_WEBHOOK_URL_FILE.",
+    "webhook_missing": "Falta configurar el DISCORD_WEBHOOK_URL del juego seleccionado o el general (también admite _FILE).",
 }
 
 
@@ -166,19 +166,20 @@ def _retry_delay(body: bytes, headers) -> float:
     return max(1, min(delay, 86400)) if math.isfinite(delay) else 60
 
 
-async def send_preview(settings, payload: dict, *, client: httpx.AsyncClient | None = None) -> PreviewDelivery:
-    if not settings.discord_webhook_url:
+async def send_preview(settings, payload: dict, *, event: Event | None = None, client: httpx.AsyncClient | None = None) -> PreviewDelivery:
+    url = discord_webhook_url(settings, event)
+    if not url:
         raise InspectionError("webhook_missing")
     # Never let debug logging print the configured webhook URL.
     logging.getLogger("httpx").setLevel(logging.CRITICAL)
     logging.getLogger("httpcore").setLevel(logging.CRITICAL)
     if client is None:
         async with httpx.AsyncClient(limits=httpx.Limits(max_connections=1), follow_redirects=False) as owned:
-            return await send_preview(settings, payload, client=owned)
+            return await send_preview(settings, payload, event=event, client=owned)
     timeout = min(30, settings.http_timeout_seconds)
     try:
         async with asyncio.timeout(timeout):
-            async with client.stream("POST", settings.discord_webhook_url, params={"wait": "true"},
+            async with client.stream("POST", url, params={"wait": "true"},
                                      json=payload, timeout=timeout, follow_redirects=False) as response:
                 status = response.status_code
                 if status in (200, 204):
@@ -209,7 +210,7 @@ async def inspect_command(settings, command: str, *, tcg=None, kind=None, source
         if not send:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
             return 0
-        outcome = await send_preview(settings, payload)
+        outcome = await send_preview(settings, payload, event=events[0])
         if outcome.sent:
             print("Vista previa enviada a Discord. La base de datos y la cola conservan su estado.")
             return 0

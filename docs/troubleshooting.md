@@ -12,6 +12,8 @@ Solo para la alternativa GHCR: el paquete es privado y necesita un registro pers
 
 Consulta logs y `python -m drop_alerts status`. En el arranque inicial, `BOOTSTRAP_MODE=silent` registra los elementos existentes sin avisar. Una regla debe coincidir con el evento. Verifica que el webhook esté configurado y siga existiendo, sin copiar su URL completa a tickets o capturas. Discord puede responder 429; la cola conserva el trabajo y respeta la espera indicada. Un error permanente puede terminar los reintentos: consulta el historial y corrige la configuración antes de reanudar operaciones.
 
+Si separas los canales por juego, comprueba `DISCORD_WEBHOOK_URL_MAGIC`, `DISCORD_WEBHOOK_URL_ONE_PIECE` o `DISCORD_WEBHOOK_URL_POKEMON` según el juego del evento. Un específico configurado tiene prioridad sobre el general. Los eventos sin juego identificado y otros TCG usan `DISCORD_WEBHOOK_URL`; sin destino aplicable permanecen pendientes. Cambiar el webhook no vuelve a enviar eventos ya entregados. Tras editar las variables en Portainer, actualiza el stack para que el contenedor las reciba.
+
 Si reinicias con un volumen vacío, empiezas una referencia nueva. Conserva el volumen para recordar estados y entregas. No elimines SQLite como primer paso de diagnóstico. Tras corregir un webhook rechazado puedes detener el servicio, ejecutar `docker compose run --rm drop-alerts retry-notifications` y volver a arrancarlo. Este comando reactiva entregas `dead` por fallos del canal; no reactiva casos que fallaron por análisis obligatorio ni mensajes ya enviados. Reintentar puede volver a enviar un mensaje cuya confirmación se hubiera perdido.
 
 ## Fuente con HTTP 403, 429 o error de extracción

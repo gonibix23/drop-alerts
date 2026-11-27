@@ -264,6 +264,12 @@ class Store:
             self.db.execute("UPDATE outbox SET status=?,attempts=?,next_attempt=?,last_error=?,delivered=? WHERE event_id=?", (status, attempts, time.time() + retry_after, error, time.time() if status == "sent" else None, event_id))
             self.db.execute("INSERT INTO notification_history(event_id,attempt,outcome,created) VALUES(?,?,?,?)", (event_id, attempts, error or "sent", time.time()))
 
+    def notification_deferred(self, event_id: str, delay: float, reason: str):
+        """No HTTP request was made; retain attempts and any longer existing backoff."""
+        with self.transaction():
+            self.db.execute("UPDATE outbox SET next_attempt=MAX(next_attempt,?),last_error=? WHERE event_id=? AND status='pending'",
+                            (time.time() + delay, reason, event_id))
+
     def notification_skipped(self, event_id: str, reason: str):
         """Close a disabled delivery without an HTTP attempt or changing backoff."""
         with self.transaction():
